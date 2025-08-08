@@ -2,41 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* Professional Design System for Microfrontend Architecture Demo
+All colors MUST be HSL. Pokemon-inspired but modern and professional.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Professional color palette inspired by Pokemon themes */
+    --background: 210 20% 98%;
+    --foreground: 215 25% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 215 25% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 215 25% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Electric blue primary inspired by Pokemon Electric type */
+    --primary: 215 90% 55%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 215 95% 70%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Soft secondary colors */
+    --secondary: 210 30% 95%;
+    --secondary-foreground: 215 25% 25%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 25% 92%;
+    --muted-foreground: 215 15% 50%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent colors for highlights */
+    --accent: 45 95% 60%;
+    --accent-foreground: 215 25% 15%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 75% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 210 20% 88%;
+    --input: 210 20% 88%;
+    --ring: 215 90% 55%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* Professional gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-hero: linear-gradient(135deg, hsl(215 90% 55%) 0%, hsl(45 95% 60%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(210 30% 98%) 100%);
+    
+    /* Shadows for depth */
+    --shadow-soft: 0 2px 10px hsl(215 25% 15% / 0.08);
+    --shadow-medium: 0 4px 20px hsl(215 25% 15% / 0.12);
+    --shadow-strong: 0 8px 30px hsl(215 25% 15% / 0.16);
+    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.3);
+
+    /* Animation timings */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +120,94 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+@layer components {
+  /* Professional component styles */
+  .hero-gradient {
+    background: var(--gradient-hero);
+  }
+  
+  .card-gradient {
+    background: var(--gradient-card);
+  }
+  
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+  
+  .shadow-medium {
+    box-shadow: var(--shadow-medium);
+  }
+  
+  .shadow-strong {
+    box-shadow: var(--shadow-strong);
+  }
+  
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+  
+  .transition-bounce {
+    transition: var(--transition-bounce);
+  }
+
+  /* Loading animations */
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.1), transparent);
+    animation: shimmer 2s infinite;
+  }
+
+  /* Pokemon type colors */
+  .type-electric { @apply bg-yellow-400 text-yellow-900; }
+  .type-fire { @apply bg-red-500 text-white; }
+  .type-water { @apply bg-blue-500 text-white; }
+  .type-grass { @apply bg-green-500 text-white; }
+  .type-normal { @apply bg-gray-400 text-gray-900; }
+  .type-fighting { @apply bg-red-700 text-white; }
+  .type-poison { @apply bg-purple-500 text-white; }
+  .type-ground { @apply bg-yellow-600 text-white; }
+  .type-flying { @apply bg-indigo-400 text-white; }
+  .type-psychic { @apply bg-pink-500 text-white; }
+  .type-bug { @apply bg-green-400 text-green-900; }
+  .type-rock { @apply bg-yellow-800 text-white; }
+  .type-ghost { @apply bg-purple-700 text-white; }
+  .type-dragon { @apply bg-indigo-700 text-white; }
+  .type-dark { @apply bg-gray-800 text-white; }
+  .type-steel { @apply bg-gray-500 text-white; }
+  .type-fairy { @apply bg-pink-300 text-pink-900; }
+  .type-ice { @apply bg-blue-300 text-blue-900; }
+
+  /* Gradient animation for header */
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  .animate-gradient {
+    animation: gradient 6s ease infinite;
   }
 }
