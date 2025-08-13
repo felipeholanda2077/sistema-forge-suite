@@ -25,11 +25,13 @@ import { useMicrofrontend } from '@/contexts/MicrofrontendContext';
 import { useAuth } from '@/hooks/useAuth';
 import { favoriteService } from '@/services/favoriteService';
 import { apiCache } from '@/lib/cache';
-import { useToast } from '@/components/ui/use-toast';
+import { toast as _toast } from '@/hooks/use-toast';
+
+// Type assertion to ensure toast is callable
+const toast = _toast as unknown as (props: { title: string; description: string; variant?: 'default' | 'destructive' }) => void;
 
 const PokemonMicrofrontend: React.FC = () => {
   const { state, dispatch } = useMicrofrontend();
-  const { toast } = useToast();
   const { isAuthenticated } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Pokemon[]>([]);
@@ -140,7 +142,7 @@ const PokemonMicrofrontend: React.FC = () => {
     };
 
     loadFavorites();
-  }, [isAuthenticated, dispatch, toast]);
+  }, [isAuthenticated, dispatch]);
 
   const toggleFavorite = async (pokemon: Pokemon) => {
     if (!isAuthenticated) {
