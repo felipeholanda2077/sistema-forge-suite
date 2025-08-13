@@ -13,6 +13,9 @@ type ToasterToast = ToastProps & {
   title?: React.ReactNode
   description?: React.ReactNode
   action?: ToastActionElement
+  icon?: React.ReactNode
+  position?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'
+  progress?: number
 }
 
 const actionTypes = {
@@ -186,8 +189,16 @@ function createToast({ ...props }: Toast): ToastReturn {
   }
 }
 
-// Type assertion to add promise method to toast function
-const toast = createToast as unknown as ToastWithPromise;
+// Export the toast function with proper type
+interface ToastFunction {
+  (props: Omit<ToasterToast, 'id'>): ToastReturn;
+  promise: <T>(
+    promise: Promise<T>,
+    data: PromiseData<T>
+  ) => { id: string; dismiss: () => void };
+}
+
+const toast = createToast as unknown as ToastFunction;
 
 toast.promise = <T,>(
   promise: Promise<T>,
