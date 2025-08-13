@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible';
-import { Button } from './Button/button';
+import { Button } from '../Button/button';
 import { ChevronDown, ChevronRight, ChevronsUpDown, GripVertical, List, Plus, X } from 'lucide-react';
 import { useState } from 'react';
 

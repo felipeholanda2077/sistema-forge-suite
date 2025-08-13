@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { Button } from './Button/button';
+import { Button } from '../Button/button';
 import {
   DropdownMenu,
   DropdownMenuContent,

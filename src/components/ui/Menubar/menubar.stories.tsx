@@ -26,14 +26,17 @@ import {
   Moon, 
   MoreHorizontal, 
   Plus, 
+  Search,
   Sun, 
   User 
 } from 'lucide-react';
+import { Input } from '../Input/input';
+import { Avatar } from '../Avatar/avatar';
 import { useState } from 'react';
 import { cn } from '../../../lib/utils';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
-import { DialogHeader } from '../Dialog/dialog';
+import { DialogFooter, DialogHeader } from '../Dialog/dialog';
 import { Menu } from '@radix-ui/react-menubar';
 
 const meta: Meta<typeof Menubar> = {

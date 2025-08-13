@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { ScrollArea } from './scroll-area';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { ScrollArea, ScrollBar } from './scroll-area';
 import { cn } from '../../../lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '../Avatar/avatar';
 import { Button } from '../Button/button';
@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from '../Separator/separator';
 import { Badge } from '../Badge/badge';
 import { Check, ChevronDown, ChevronUp, Filter, Search } from 'lucide-react';
+import React from 'react';
 
 const meta: Meta<typeof ScrollArea> = {
   title: 'Components/Scroll Area',
@@ -63,7 +64,7 @@ export const Horizontal: Story = {
             </div>
           ))}
         </div>
-        <ScrollArea.ScrollBar orientation="horizontal" />
+        <ScrollBar orientation="horizontal" />
       </ScrollArea>
     </div>
   ),
@@ -102,7 +103,7 @@ export const CustomScrollbar: Story = {
             ))}
           </div>
         </div>
-        <ScrollArea.ScrollBar className="w-2" />
+        <ScrollBar className="w-2" />
       </ScrollArea>
     </div>
   ),

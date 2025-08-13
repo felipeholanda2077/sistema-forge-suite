@@ -1,10 +1,11 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Popover, PopoverContent, PopoverTrigger } from './Popover/popover';
-import { Button } from './Button/button';
-import { Calendar } from './calendar';
-import { CalendarDays, Check, ChevronsUpDown, Info, Plus, Settings, X } from 'lucide-react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Popover, PopoverContent, PopoverTrigger } from '../Popover/popover';
+import { Button } from '../Button/button';
+import { Calendar } from '../Calendar/calendar';
+import { Bell, CalendarDays, Check, ChevronsUpDown, CreditCard, Info, LifeBuoy, LogOut, MessageCircle, MessageSquare, Plus, Server, Settings, User, UserPlus, X } from 'lucide-react';
 import { format } from 'date-fns';
-import { cn } from '../../lib/utils';
+import { cn } from '../../../lib/utils';
+import { useState } from 'react';
 
 const meta: Meta<typeof Popover> = {
   title: 'Components/Popover',

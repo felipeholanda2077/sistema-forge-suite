@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Switch } from './switch';
-import { Label } from './label';
+import { Label } from '../Label/label';
 import { useState } from 'react';
 import { Sun, Moon, Bell, BellOff, Wifi, WifiOff, Check, X } from 'lucide-react';
 

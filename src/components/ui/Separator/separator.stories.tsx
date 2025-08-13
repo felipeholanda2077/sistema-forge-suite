@@ -1,18 +1,17 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Separator } from './Separator/separator';
-import { cn } from '../../lib/utils';
-import { Button } from './Button/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './Card/card';
-import { Input } from './Input/input';
-import { Label } from './label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './Tabs/tabs';
-import { Textarea } from './TextArea/textarea';
-import { Badge } from './Badge/badge';
-import { Avatar, AvatarFallback, AvatarImage } from './avatar';
-import { Checkbox } from './Checkbox/checkbox';
-import { RadioGroup, RadioGroupItem } from './radio-group';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
-import { Switch } from './switch';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Separator } from '../Separator/separator';
+import { cn } from '../../../lib/utils';
+import { Button } from '../Button/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../Card/card';
+import { Input } from '../Input/input';
+import { Label } from '../Label/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../Tabs/tabs';
+import { Textarea } from '../TextArea/textarea';
+import { Badge } from '../Badge/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '../Avatar/avatar';
+import { Checkbox } from '../Checkbox/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../Select/select';
+import { Switch } from '../Switch/switch';
 
 const meta: Meta<typeof Separator> = {
   title: 'Components/Separator',

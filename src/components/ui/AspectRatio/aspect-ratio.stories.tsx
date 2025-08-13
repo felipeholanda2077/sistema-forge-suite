@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { AspectRatio } from './aspect-ratio';
 import { Card, CardContent } from '../Card/card';
 

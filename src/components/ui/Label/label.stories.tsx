@@ -1,12 +1,12 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Label } from './label';
-import { Input } from './Input/input';
-import { Checkbox } from './Checkbox/checkbox';
-import { Button } from './Button/button';
-import { RadioGroup, RadioGroupItem } from './RadioGroup/radio-group';
-import { Textarea } from './TextArea/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './Select/select';
-import { Switch } from './Switch/switch';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Label } from '../Label/label';
+import { Input } from '../Input/input';
+import { Checkbox } from '../Checkbox/checkbox';
+import { Button } from '../Button/button';
+import { RadioGroup, RadioGroupItem } from '../RadioGroup/radio-group';
+import { Textarea } from '../TextArea/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../Select/select';
+import { Switch } from '../Switch/switch';
 
 const meta: Meta<typeof Label> = {
   title: 'Components/Label',

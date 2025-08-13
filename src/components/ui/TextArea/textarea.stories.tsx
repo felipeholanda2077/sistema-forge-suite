@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Textarea } from './TextArea/textarea';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Textarea } from '../TextArea/textarea';
 import { useState } from 'react';
 import { Paperclip, Mic, Smile, Send, X, Check, AlertCircle } from 'lucide-react';
-import { Button } from './Button/button';
+import { Button } from '../Button/button';
 
 const meta: Meta<typeof Textarea> = {
   title: 'Components/Textarea',

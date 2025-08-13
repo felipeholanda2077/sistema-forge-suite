@@ -1,6 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import * as React from 'react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from './resizable';
-import { Button } from './Button/button';
+import { Button } from '../Button/button';
 import { cn } from '../../../lib/utils';
 import { GripVertical, PanelLeft, PanelRight } from 'lucide-react';
 
@@ -456,14 +457,14 @@ export const WithPercentageSizes: Story = {
 // With pixel-based min and max sizes
 export const WithPixelSizes: Story = {
   render: () => {
-    const [sizes, setSizes] = React.useState([200, '1fr', 300]);
+    const [sizes, setSizes] = React.useState<number[]>([200, 50, 300]);
     
     return (
       <div className="w-full max-w-4xl">
         <ResizablePanelGroup
           direction="horizontal"
           className="min-h-[200px] max-w-full rounded-lg border"
-          onLayout={(newSizes: any[]) => setSizes(newSizes)}
+          onLayout={(newSizes: number[]) => setSizes(newSizes)}
         >
           <ResizablePanel 
             defaultSize={200}
@@ -477,21 +478,21 @@ export const WithPixelSizes: Story = {
                 Min: 150px, Max: 400px
               </p>
               <p className="mt-2 text-xs text-muted-foreground">
-                Current: {typeof sizes[0] === 'number' ? `${sizes[0]}px` : sizes[0]}
+                Current: {sizes[0]}px
               </p>
             </div>
           </ResizablePanel>
           
           <ResizableHandle withHandle />
           
-          <ResizablePanel defaultSize="1fr" className="p-4">
+          <ResizablePanel defaultSize={50} className="p-4">
             <div className="h-full rounded-lg bg-muted/20 p-4">
               <h3 className="mb-2 text-sm font-medium">Content</h3>
               <p className="text-sm text-muted-foreground">
                 Flexible content area that takes remaining space
               </p>
               <p className="mt-2 text-xs text-muted-foreground">
-                Current: {typeof sizes[1] === 'number' ? `${sizes[1]}px` : sizes[1]}
+                Current: {sizes[1]}%
               </p>
             </div>
           </ResizablePanel>
@@ -510,7 +511,7 @@ export const WithPixelSizes: Story = {
                 Min: 200px, Max: 500px
               </p>
               <p className="mt-2 text-xs text-muted-foreground">
-                Current: {typeof sizes[2] === 'number' ? `${sizes[2]}px` : sizes[2]}
+                Current: {sizes[2]}px
               </p>
             </div>
           </ResizablePanel>
