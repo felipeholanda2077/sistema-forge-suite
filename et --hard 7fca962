@@ -1,0 +1,57 @@
+[33m41f0708[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: reset: moving to HEAD
+[33m41f0708[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{1}: reset: moving to HEAD
+[33m41f0708[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{2}: reset: moving to HEAD~1
+[33m6bf80f9[m HEAD@{3}: reset: moving to HEAD~1
+[33m7fca962[m HEAD@{4}: commit: create: Implement animated forgot password page with validation, API integration, and dev reset link display
+[33m6bf80f9[m HEAD@{5}: commit: create: Implement animated registration page with validation, error handling, and auto-login
+[33m41f0708[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{6}: commit: create: Implement animated login page with authentication and error handling
+[33mbe31e93[m HEAD@{7}: commit: create: tooltip component & storybook
+[33m3f16e08[m HEAD@{8}: commit: create: toogle-group component & storybook
+[33m0b06fc1[m HEAD@{9}: commit: create: input-otp component & storybook
+[33m5e9c97b[m HEAD@{10}: commit: relocation: ui components
+[33m92c3f5e[m HEAD@{11}: commit: create: toaster component & storybook
+[33me0ecaf1[m HEAD@{12}: commit: create: tabs component & storybook
+[33m0cbfbec[m HEAD@{13}: commit: create: switch component & storybook
+[33mfb4fd77[m HEAD@{14}: commit: create: table component & storybook
+[33mf19fd0e[m HEAD@{15}: commit: create: sidebar component & storybook
+[33m5691d0f[m HEAD@{16}: commit: create: color-picker component & storybook
+[33mf6405fd[m HEAD@{17}: commit: create: toggle component & storybook
+[33m447c9fe[m HEAD@{18}: commit: create: slider component & storybook
+[33m9d89e16[m HEAD@{19}: commit: create: toast component & storybook
+[33md8b1131[m HEAD@{20}: commit: create: textarea component & storybook
+[33m4c40cc8[m HEAD@{21}: commit: create: radio-group component & storybook
+[33m2a2d2c0[m HEAD@{22}: commit: create: popover component & storybook
+[33m5565cbc[m HEAD@{23}: commit: create: sheet component & storybook
+[33m56c7ba1[m HEAD@{24}: commit: create: separator component & storybook
+[33m0de24fc[m HEAD@{25}: commit: create: skeleton component & storybook
+[33mec48e4e[m HEAD@{26}: commit: create: hover-card component & storybook
+[33m339a187[m HEAD@{27}: commit: create: select component & storybook
+[33m9bde712[m HEAD@{28}: commit: create: progress component & storybook
+[33m258d218[m HEAD@{29}: commit: create: scroll-area component & storybook
+[33m46db778[m HEAD@{30}: commit: create: navigation component & storybook
+[33me5cdf91[m HEAD@{31}: commit: create: dropdown component & storybook
+[33m2b02999[m HEAD@{32}: commit: create: pagination component & storybook
+[33m1cc3e58[m HEAD@{33}: commit: create: label component & storybook
+[33m91f09c3[m HEAD@{34}: commit: create: sonner component & storybook
+[33ma1e17b0[m HEAD@{35}: commit: create: command component & storybook
+[33m9aa3fba[m HEAD@{36}: commit: create: resizable component & storybook
+[33m6a540fe[m HEAD@{37}: commit: create: input component & storybook
+[33md985a7d[m HEAD@{38}: commit: create: menubar component & storybook
+[33m8747018[m HEAD@{39}: commit: create: form component & storybook
+[33m966cb5e[m HEAD@{40}: commit: create: dialog component & storybook
+[33m9b30a44[m HEAD@{41}: commit: create: drawer component & storybook
+[33mb1cfc9a[m HEAD@{42}: commit: create: collapsible component & storybook
+[33m2c497b1[m HEAD@{43}: commit: create: context component & storybook
+[33m8db9d16[m HEAD@{44}: commit: create: checkbox component & storybook
+[33me66365f[m HEAD@{45}: commit: create: chart component & storybook
+[33mb08ce26[m HEAD@{46}: commit: create: card component & storybook
+[33mec6e765[m HEAD@{47}: commit: create: button component & storybook
+[33md8d57fd[m HEAD@{48}: commit: create: calendar component & storybook
+[33m46ed63f[m HEAD@{49}: commit: create: breadcrumb component & storybook
+[33m290d73f[m HEAD@{50}: commit: create: carousel component & storybook
+[33m2c78247[m HEAD@{51}: commit: create: badge component & storybook
+[33m8847c9d[m HEAD@{52}: commit: create: avatar component & storybook
+[33m71913c6[m HEAD@{53}: commit: create: alert component & storybook
+[33mfb995bd[m HEAD@{54}: commit: create: alert-dialog component & storybook
+[33m6e290ca[m HEAD@{55}: commit: create: accordion component & storybook
+[33m269256f[m HEAD@{56}: clone: from github.com:felipeholanda2077/arcane-forge-suite.git
