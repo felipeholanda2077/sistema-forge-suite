@@ -12,11 +12,15 @@ interface CacheItem<T> {
 interface CacheConfig {
   defaultTTL: number; // Time to live in milliseconds
   maxSize: number;    // Maximum number of items in cache
+  trackStats?: boolean; // Whether to track cache statistics
 }
 
 class APICache {
-  private cache = new Map<string, CacheItem<any>>();
+  private cache = new Map<string, CacheItem<unknown>>();
   private config: CacheConfig;
+  private hits = 0;
+  private misses = 0;
+  private totalRequests = 0;
 
   constructor(config: CacheConfig = { defaultTTL: 5 * 60 * 1000, maxSize: 100 }) {
     this.config = config;
@@ -25,12 +29,16 @@ class APICache {
   /**
    * Get item from cache if not expired
    */
-  get<T>(key: string): T | null {
+  get<T = unknown>(key: string): T | null {
+    this.totalRequests++;
     const item = this.cache.get(key);
     
     if (!item) {
+      this.misses++;
       return null;
     }
+    
+    this.hits++;
 
     const now = Date.now();
     const isExpired = now - item.timestamp > item.expiresIn;
@@ -40,13 +48,13 @@ class APICache {
       return null;
     }
 
-    return item.data;
+    return item.data as T;
   }
 
   /**
    * Set item in cache with optional TTL
    */
-  set<T>(key: string, data: T, ttl?: number): void {
+  set<T = unknown>(key: string, data: T, ttl?: number): void {
     // If cache is at max size, remove oldest item
     if (this.cache.size >= this.config.maxSize) {
       const firstKey = this.cache.keys().next().value;
@@ -89,9 +97,17 @@ class APICache {
    * Get cache statistics
    */
   getStats() {
+    const hitRate = this.totalRequests > 0 
+      ? Math.round((this.hits / this.totalRequests) * 100) 
+      : 0;
+      
     return {
       size: this.cache.size,
       maxSize: this.config.maxSize,
+      hits: this.hits,
+      misses: this.misses,
+      totalRequests: this.totalRequests,
+      hitRate: hitRate,
       keys: Array.from(this.cache.keys()),
     };
   }
@@ -101,6 +117,7 @@ class APICache {
 export const apiCache = new APICache({
   defaultTTL: 5 * 60 * 1000, // 5 minutes for Pokemon data
   maxSize: 200, // Store up to 200 Pokemon/API responses
+  trackStats: true, // Enable statistics tracking
 });
 
 /**

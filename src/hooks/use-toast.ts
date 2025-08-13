@@ -3,7 +3,7 @@ import * as React from "react"
 import type {
   ToastActionElement,
   ToastProps,
-} from "@/components/ui/toast"
+} from "@/components/ui/Toast/toast"
 
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000000
@@ -139,7 +139,25 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">
 
-function toast({ ...props }: Toast) {
+type ToastContent = string | { title?: string; description?: string; variant?: 'default' | 'destructive' };
+
+type PromiseData<T = unknown> = {
+  loading: string | React.ReactNode;
+  success: string | ((data: T) => string | { title?: string; description?: string });
+  error: string | ((error: Error) => string | { title?: string; description?: string });
+};
+
+interface ToastReturn {
+  id: string;
+  dismiss: () => void;
+  update: (props: ToasterToast) => void;
+}
+
+interface ToastWithPromise extends ToastReturn {
+  promise: <T>(promise: Promise<T>, data: PromiseData<T>) => { id: string; dismiss: () => void };
+}
+
+function createToast({ ...props }: Toast): ToastReturn {
   const id = genId()
 
   const update = (props: ToasterToast) =>
@@ -167,6 +185,89 @@ function toast({ ...props }: Toast) {
     update,
   }
 }
+
+// Type assertion to add promise method to toast function
+const toast = createToast as unknown as ToastWithPromise;
+
+toast.promise = <T,>(
+  promise: Promise<T>,
+  data: PromiseData
+) => {
+  const id = genId();
+  
+  // Show loading state
+  dispatch({
+    type: "ADD_TOAST",
+    toast: {
+      id,
+      title: typeof data.loading === 'string' ? data.loading : 'Loading...',
+      description: typeof data.loading === 'string' ? undefined : data.loading,
+      open: true,
+    },
+  });
+
+  // Handle promise resolution/rejection
+  promise
+    .then((response) => {
+      const successData = typeof data.success === 'function' 
+        ? data.success(response)
+        : data.success;
+      
+      const toastData = (() => {
+        if (typeof successData === 'string') {
+          return { title: successData };
+        } else if (typeof successData === 'object' && successData !== null) {
+          return { 
+            title: 'title' in successData ? String(successData.title) : 'Success',
+            description: 'description' in successData ? String(successData.description) : undefined
+          };
+        }
+        return { title: 'Success', description: String(successData) };
+      })();
+      
+      dispatch({
+        type: "UPDATE_TOAST",
+        toast: {
+          id,
+          title: toastData.title,
+          description: toastData.description,
+          variant: 'default' as const,
+        },
+      });
+    })
+    .catch((error) => {
+      const errorData = typeof data.error === 'function'
+        ? data.error(error)
+        : data.error;
+      
+      const toastError = (() => {
+        if (typeof errorData === 'string') {
+          return { title: 'Error', description: errorData };
+        } else if (typeof errorData === 'object' && errorData !== null) {
+          return { 
+            title: 'title' in errorData ? String(errorData.title) : 'Error',
+            description: 'description' in errorData ? String(errorData.description) : 'An error occurred'
+          };
+        }
+        return { title: 'Error', description: String(errorData) };
+      })();
+      
+      dispatch({
+        type: "UPDATE_TOAST",
+        toast: {
+          id,
+          title: toastError.title,
+          description: toastError.description,
+          variant: 'destructive' as const,
+        },
+      });
+    });
+
+  return {
+    id,
+    dismiss: () => dispatch({ type: "DISMISS_TOAST", toastId: id }),
+  };
+};
 
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState)

@@ -5,12 +5,12 @@
 
 import React from 'react';
 import { MicrofrontendProvider } from '@/contexts/MicrofrontendContext';
-import Header from '@/components/Header';
+import { PageHeader } from '@/components/PageHeader';
 import CacheMonitor from '@/components/CacheMonitor';
 import AuthMicrofrontend from '@/microfrontends/AuthMicrofrontend';
 import PokemonMicrofrontend from '@/microfrontends/PokemonMicrofrontend';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card/card';
+import { Badge } from '@/components/ui/Badge/badge';
 import { 
   Layers,
   Shield, 
@@ -24,10 +24,10 @@ import {
 const Index = () => {
   return (
     <MicrofrontendProvider>
-      <div className="min-h-screen bg-background">
-        <Header />
+      <div className="min-h-screen bg-background flex flex-col">
+        <PageHeader />
         
-        <main className="container mx-auto px-4 py-8 space-y-8">
+        <main className="flex-1 container mx-auto px-4 py-8 space-y-8">
           {/* Visão Geral da Arquitetura */}
           <Card className="shadow-strong animate-fade-in">
             <CardHeader>
@@ -104,20 +104,9 @@ const Index = () => {
           <CacheMonitor />
 
             {/* Layout dos Microfrontends */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className=" grid-cols-2 lg:grid-cols-3 gap-8">
               {/* Microfrontend de Autenticação - Coluna Esquerda */}
-              <div className="lg:col-span-1">
-                <div className="mb-4">
-                  <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-                    <Shield className="w-6 h-6" />
-                    🔐 Microfrontend de Autenticação
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Sistema isolado de autenticação demonstrando separação de responsabilidades dos microfrontends
-                  </p>
-                </div>
-                <AuthMicrofrontend />
-              </div>
+              
 
               {/* Microfrontend da API Pokémon - Colunas Direitas */}
               <div className="lg:col-span-2">
@@ -134,58 +123,7 @@ const Index = () => {
               </div>
             </div>
 
-          {/* Technical Notes */}
-          <Card className="shadow-medium border-2 border-primary/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Code2 className="w-5 h-5" />
-                Technical Implementation Notes
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-semibold mb-2 text-primary">Microfrontend Architecture</h4>
-                  <ul className="text-sm space-y-1 text-muted-foreground">
-                    <li>• Separated authentication and API integration concerns</li>
-                    <li>• Shared state management via React Context</li>
-                    <li>• Isolated component trees with clear boundaries</li>
-                    <li>• Cross-microfrontend communication demonstrated</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h4 className="font-semibold mb-2 text-primary">Cache Implementation</h4>
-                  <ul className="text-sm space-y-1 text-muted-foreground">
-                    <li>• TTL-based expiration (5-30 minutes per endpoint)</li>
-                    <li>• LRU eviction with configurable size limits</li>
-                    <li>• Cache-aware fetch wrapper for transparent usage</li>
-                    <li>• Real-time performance monitoring</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold mb-2 text-primary">External API Integration</h4>
-                  <ul className="text-sm space-y-1 text-muted-foreground">
-                    <li>• PokeAPI integration with full TypeScript types</li>
-                    <li>• Error handling and fallback strategies</li>
-                    <li>• Search, random discovery, and favorites</li>
-                    <li>• Optimized data fetching patterns</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold mb-2 text-primary">Backend Integration Ready</h4>
-                  <ul className="text-sm space-y-1 text-muted-foreground">
-                    <li>• Supabase integration available for production auth</li>
-                    <li>• JWT-ready authentication flow</li>
-                    <li>• User management and profile storage</li>
-                    <li>• Scalable database schema design</li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          
         </main>
       </div>
     </MicrofrontendProvider>

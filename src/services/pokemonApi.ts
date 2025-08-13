@@ -43,6 +43,18 @@ export interface PokemonSprites {
   front_shiny_female?: string;
   back_default: string;
   back_shiny: string;
+  other?: {
+    'official-artwork'?: {
+      front_default?: string;
+    };
+    dream_world?: {
+      front_default?: string;
+    };
+    home?: {
+      front_default?: string;
+      front_shiny?: string;
+    };
+  };
 }
 
 export interface Pokemon {
@@ -194,7 +206,11 @@ export const pokemonApi = new PokemonApiService();
 
 // Export utility functions
 export function getPokemonImageUrl(pokemon: Pokemon): string {
-  return pokemon.sprites.front_default || 
+  // Try to get official artwork first, then other sprite options
+  return pokemon.sprites.other?.['official-artwork']?.front_default ||
+         pokemon.sprites.other?.dream_world?.front_default ||
+         pokemon.sprites.other?.home?.front_default ||
+         pokemon.sprites.front_default || 
          pokemon.sprites.front_shiny || 
          '/placeholder.svg';
 }

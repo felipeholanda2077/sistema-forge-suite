@@ -3,8 +3,8 @@
  */
 
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/Badge/badge';
+import { Card } from '@/components/ui/Card/card';
 import { 
   Layers, 
   Zap, 

@@ -4,12 +4,12 @@
  */
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card/card';
+import { Button } from '@/components/ui/Button/button';
+import { Input } from '@/components/ui/Input/input';
+import { Label } from '@/components/ui/Label/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs/tabs';
+import { Badge } from '@/components/ui/Badge/badge';
 import { User, Mail, Lock, UserPlus, LogIn, Shield } from 'lucide-react';
 import { useMicrofrontend } from '@/contexts/MicrofrontendContext';
 import { useToast } from '@/hooks/use-toast';
