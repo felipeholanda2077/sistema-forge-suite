@@ -1,18 +1,15 @@
-import { Metadata } from 'next';
+import React from 'react';
 
-export const metadata: Metadata = {
-  title: 'Autenticação | Sistema Arcane Forge',
-  description: 'Páginas de autenticação',
-};
-
-export default function AuthLayout({
-  children,
-}: {
+interface AuthLayoutProps {
   children: React.ReactNode;
-}) {
+}
+
+const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       {children}
     </div>
   );
-}
+};
+
+export default AuthLayout;
