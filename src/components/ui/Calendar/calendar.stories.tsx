@@ -348,24 +348,27 @@ export const WithDateIndicators: Story = {
               const hasEvent = hasEvents(day);
               const eventTypes = hasEvent ? getEventTypes(day) : [];
               
+              // Create a new props object that includes the className
+              const dayProps = {
+                ...props,
+                className: cn(
+                  'relative flex h-9 w-9 items-center justify-center p-0 text-sm font-normal',
+                  'hover:bg-accent hover:text-accent-foreground',
+                  'focus:bg-accent focus:text-accent-foreground',
+                  'data-[selected]:bg-primary data-[selected]:text-primary-foreground',
+                  'data-[disabled]:text-muted-foreground data-[disabled]:opacity-50',
+                  'data-[outside]:text-muted-foreground/50',
+                  'data-[selected]:data-[outside]:text-primary-foreground/50',
+                  'rounded-full',
+                  'transition-colors',
+                  'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                  (props as { className?: string }).className // Type-safe access to className
+                )
+              };
+              
               return (
                 <div className="relative">
-                  <div
-                    {...props}
-                    className={cn(
-                      'relative flex h-9 w-9 items-center justify-center p-0 text-sm font-normal',
-                      'hover:bg-accent hover:text-accent-foreground',
-                      'focus:bg-accent focus:text-accent-foreground',
-                      'data-[selected]:bg-primary data-[selected]:text-primary-foreground',
-                      'data-[disabled]:text-muted-foreground data-[disabled]:opacity-50',
-                      'data-[outside]:text-muted-foreground/50',
-                      'data-[selected]:data-[outside]:text-primary-foreground/50',
-                      'rounded-full',
-                      'transition-colors',
-                      'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                      props.className
-                    )}
-                  >
+                  <div {...dayProps}>
                     {day.getDate()}
                   </div>
                   

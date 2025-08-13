@@ -1,125 +1,214 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { LineChart, BarChart, PieChart, AreaChart, RadarChart } from 'recharts';
+// Import Recharts components
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  AreaChart,
+  Area,
+  RadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
+
+// Recharts component props
+type LineChartProps = React.ComponentProps<typeof LineChart>;
+type BarChartProps = React.ComponentProps<typeof BarChart>;
+type PieChartProps = React.ComponentProps<typeof PieChart>;
+type AreaChartProps = React.ComponentProps<typeof AreaChart>;
+type RadarProps = React.ComponentProps<typeof Radar>;
+type LineProps = React.ComponentProps<typeof Line>;
+type BarProps = React.ComponentProps<typeof Bar>;
+type PieProps = React.ComponentProps<typeof Pie>;
+type AreaProps = React.ComponentProps<typeof Area>;
+type CellProps = React.ComponentProps<typeof Cell>;
+type XAxisProps = React.ComponentProps<typeof XAxis>;
+type YAxisProps = React.ComponentProps<typeof YAxis>;
+type CartesianGridProps = React.ComponentProps<typeof CartesianGrid>;
+type TooltipProps = React.ComponentProps<typeof Tooltip>;
+type LegendProps = React.ComponentProps<typeof Legend>;
+type ResponsiveContainerProps = React.ComponentProps<typeof ResponsiveContainer>;
 import { Card, CardContent, CardHeader, CardTitle } from '../Card/card';
 import { Button } from '../Button/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../Tabs/tabs';
 import { ArrowUp, ArrowDown, TrendingUp, BarChart as BarChartIcon, PieChart as PieChartIcon, LineChart as LineChartIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const meta: Meta<typeof LineChart> = {
+// Define the meta configuration for Storybook
+const meta = {
   title: 'Components/Chart',
   component: LineChart,
-  tags: ['autodocs'],
+  tags: ['autodocs'] as const,
   parameters: {
-    layout: 'centered',
+    layout: 'centered' as const,
   },
-};
-
+  // Add argTypes for better controls in Storybook
+  argTypes: {
+    width: { control: 'number' },
+    height: { control: 'number' },
+    data: { control: 'object' },
+    margin: { control: 'object' },
+  },
+} satisfies Meta<typeof LineChart>;
 
 export default meta;
-type Story = StoryObj<typeof LineChart>;
+
+type Story = StoryObj<typeof meta>;
+
+// Types for chart data
+type ChartData = Array<{
+  name: string;
+  [key: string]: string | number;
+}>;
+
+// Type for pie chart data
+type PieChartData = Array<{
+  name: string;
+  value: number;
+  color?: string;
+}>;
+
+// Colors for charts
+const COLORS = [
+  'hsl(var(--primary))',
+  'hsl(var(--muted-foreground))',
+  'hsl(var(--accent))',
+  'hsl(var(--primary))',
+  'hsl(var(--muted-foreground))',
+  'hsl(var(--accent))',
+];
 
 // Sample data for charts
-const lineChartData = {
-  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-  datasets: [
-    {
-      label: 'Revenue',
-      data: [65000, 59000, 80000, 81000, 86000, 85000, 90000],
-      borderColor: 'hsl(var(--primary))',
-      backgroundColor: 'hsl(var(--primary) / 0.1)',
-      tension: 0.4,
-      fill: true,
-    },
-    {
-      label: 'Expenses',
-      data: [28000, 48000, 40000, 19000, 86000, 27000, 35000],
-      borderColor: 'hsl(var(--destructive))',
-      backgroundColor: 'hsl(var(--destructive) / 0.1)',
-      tension: 0.4,
-      fill: true,
-    },
-  ],
+const lineChartData = [
+  {
+    name: 'Jan',
+    Revenue: 65000,
+    Expenses: 28000,
+  },
+  {
+    name: 'Feb',
+    Revenue: 59000,
+    Expenses: 48000,
+  },
+  {
+    name: 'Mar',
+    Revenue: 80000,
+    Expenses: 40000,
+  },
+  {
+    name: 'Apr',
+    Revenue: 81000,
+    Expenses: 19000,
+  },
+  {
+    name: 'May',
+    Revenue: 86000,
+    Expenses: 86000,
+  },
+  {
+    name: 'Jun',
+    Revenue: 85000,
+    Expenses: 27000,
+  },
+  {
+    name: 'Jul',
+    Revenue: 90000,
+    Expenses: 35000,
+  },
+];
+
+const barChartData = [
+  {
+    name: 'Q1',
+    '2023': 540,
+    '2024': 620,
+  },
+  {
+    name: 'Q2',
+    '2023': 325,
+    '2024': 480,
+  },
+  {
+    name: 'Q3',
+    '2023': 702,
+    '2024': 650,
+  },
+  {
+    name: 'Q4',
+    '2023': 620,
+    '2024': 900,
+  },
+];
+
+const pieChartData: PieChartData = [
+  { name: 'Desktop', value: 63, color: 'hsl(var(--primary))' },
+  { name: 'Mobile', value: 27, color: 'hsl(var(--muted-foreground))' },
+  { name: 'Tablet', value: 10, color: 'hsl(var(--accent))' },
+];
+
+const pieChartColors = pieChartData.map(item => item.color);
+
+const areaChartData = [
+  { name: 'Mon', Users: 120 },
+  { name: 'Tue', Users: 190 },
+  { name: 'Wed', Users: 300 },
+  { name: 'Thu', Users: 500 },
+  { name: 'Fri', Users: 200 },
+  { name: 'Sat', Users: 300 },
+  { name: 'Sun', Users: 400 },
+];
+
+const radarChartData = [
+  { subject: 'Design', 'Skill Level': 90, 'Team Average': 65 },
+  { subject: 'Development', 'Skill Level': 85, 'Team Average': 75 },
+  { subject: 'Marketing', 'Skill Level': 80, 'Team Average': 60 },
+  { subject: 'Sales', 'Skill Level': 75, 'Team Average': 70 },
+  { subject: 'Support', 'Skill Level': 70, 'Team Average': 80 },
+  { subject: 'HR', 'Skill Level': 65, 'Team Average': 55 },
+];
+
+const radarChartColors = {
+  'Skill Level': 'hsl(var(--primary))',
+  'Team Average': 'hsl(var(--muted-foreground))',
 };
 
-const barChartData = {
-  labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-  datasets: [
-    {
-      label: '2023',
-      data: [540, 325, 702, 620],
-      backgroundColor: 'hsl(var(--primary))',
-      borderRadius: 4,
-    },
-    {
-      label: '2024',
-      data: [600, 480, 800, 790],
-      backgroundColor: 'hsl(var(--muted-foreground) / 0.5)',
-      borderRadius: 4,
-    },
-  ],
+// Helper function to safely sum chart data
+const sumChartData = (data: readonly number[]): number => {
+  return data.reduce((sum, point) => sum + point, 0);
 };
 
-const pieChartData = {
-  labels: ['Desktop', 'Mobile', 'Tablet'],
-  datasets: [
-    {
-      data: [63, 30, 7],
-      backgroundColor: [
-        'hsl(var(--primary))',
-        'hsl(var(--primary) / 0.7)',
-        'hsl(var(--primary) / 0.4)',
-      ],
-      borderWidth: 0,
-    },
-  ],
-};
-
-const areaChartData = {
-  labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-  datasets: [
-    {
-      label: 'Active Users',
-      data: [1200, 1900, 1500, 2800, 2200, 3000, 2500],
-      borderColor: 'hsl(var(--primary))',
-      backgroundColor: 'hsl(var(--primary) / 0.2)',
-      tension: 0.4,
-      fill: true,
-    },
-  ],
-};
-
-const radarChartData = {
-  labels: ['Design', 'Development', 'Marketing', 'Sales', 'Support', 'HR'],
-  datasets: [
-    {
-      label: 'Team A',
-      data: [65, 59, 90, 81, 56, 55],
-      backgroundColor: 'hsl(var(--primary) / 0.2)',
-      borderColor: 'hsl(var(--primary))',
-      pointBackgroundColor: 'hsl(var(--primary))',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'hsl(var(--primary))',
-    },
-    {
-      label: 'Team B',
-      data: [28, 48, 40, 19, 96, 27],
-      backgroundColor: 'hsl(var(--muted-foreground) / 0.1)',
-      borderColor: 'hsl(var(--muted-foreground))',
-      pointBackgroundColor: 'hsl(var(--muted-foreground))',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'hsl(var(--muted-foreground))',
-    },
-  ],
+// Type to make all properties mutable
+type Mutable<T> = {
+  -readonly [P in keyof T]: T[P] extends readonly (infer U)[] ? U[] : T[P];
 };
 
 // Line chart with trend indicator
-export const Line: Story = {
-  render: () => {
-    const total = lineChartData.datasets[0].data.reduce((a, b) => a + b, 0);
-    const change = ((lineChartData.datasets[0].data[6] - lineChartData.datasets[0].data[0]) / lineChartData.datasets[0].data[0]) * 100;
+export const LineChartExample: Story = {
+  args: {
+    width: 600,
+    height: 300,
+  },
+  render: (args) => {
+    // Calculate total and change for the first data series (Revenue)
+    const firstValue = lineChartData[0].Revenue;
+    const lastValue = lineChartData[lineChartData.length - 1].Revenue;
+    const total = lineChartData.reduce((sum, point) => sum + point.Revenue, 0);
+    const change = ((lastValue - firstValue) / Math.max(1, firstValue)) * 100;
+    
+    // The data is already in the correct format for Recharts
+    const chartData = [...lineChartData];
     
     return (
       <Card className="w-[600px]">
@@ -147,7 +236,49 @@ export const Line: Story = {
             <div className="text-sm text-muted-foreground ml-auto">vs last 6 months</div>
           </div>
           <div className="h-[300px]">
-            <LineChart data={lineChartData} />
+            <LineChart
+              width={args.width}
+              height={args.height}
+              data={chartData}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis 
+                dataKey="name" 
+                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis 
+                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  borderColor: 'hsl(var(--border))',
+                  borderRadius: 'var(--radius)',
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="Revenue"
+                stroke="hsl(var(--primary))"
+                strokeWidth={2}
+                dot={false}
+                activeDot={{ r: 6, strokeWidth: 0 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="Expenses"
+                stroke="hsl(var(--muted-foreground))"
+                strokeWidth={2}
+                dot={false}
+                strokeDasharray="5 5"
+                activeDot={{ r: 6, strokeWidth: 0 }}
+              />
+            </LineChart>
           </div>
         </CardContent>
       </Card>
@@ -156,49 +287,65 @@ export const Line: Story = {
 };
 
 // Bar chart with comparison
-export const Bar: Story = {
+export const BarChartExample: Story = {
   render: () => (
     <Card className="w-[600px]">
       <CardHeader>
-        <CardTitle>Quarterly Sales</CardTitle>
+        <div className="flex justify-between items-center">
+          <CardTitle>Quarterly Revenue</CardTitle>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center">
+              <div className="w-3 h-3 rounded-full bg-primary mr-2" />
+              <span className="text-sm">2023</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 rounded-full bg-muted-foreground mr-2" />
+              <span className="text-sm">2024</span>
+            </div>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
-          <BarChart 
-            data={barChartData} 
-            options={{
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  grid: {
-                    color: 'hsl(var(--border))',
-                  },
-                  ticks: {
-                    callback: function(value) {
-                      return '$' + value + 'k';
-                    },
-                  },
-                },
-                x: {
-                  grid: {
-                    display: false,
-                  },
-                },
-              },
-              plugins: {
-                legend: {
-                  position: 'top' as const,
-                },
-                tooltip: {
-                  callbacks: {
-                    label: function(context) {
-                      return context.dataset.label + ': $' + context.parsed.y + 'k';
-                    },
-                  },
-                },
-              },
-            }}
-          />
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={barChartData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis 
+                dataKey="name" 
+                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis 
+                tickFormatter={(value) => `$${value}K`}
+                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip 
+                formatter={(value) => [`$${value}K`, 'Revenue']}
+                labelFormatter={(label) => `Quarter ${label}`}
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  borderColor: 'hsl(var(--border))',
+                  borderRadius: 'var(--radius)',
+                }}
+              />
+              <Bar dataKey="2023" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]}>
+                {barChartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill="hsl(var(--primary))" />
+                ))}
+              </Bar>
+              <Bar dataKey="2024" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]}>
+                {barChartData.map((entry, index) => (
+                  <Cell key={`cell-${index}-2024`} fill="hsl(var(--muted-foreground))" />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </CardContent>
     </Card>
@@ -206,48 +353,64 @@ export const Bar: Story = {
 };
 
 // Pie chart with legend
-export const Pie: Story = {
-  render: () => (
-    <Card className="w-[500px]">
-      <CardHeader>
-        <CardTitle>Traffic Sources</CardTitle>
-      </CardHeader>
-      <CardContent className="flex items-center justify-center gap-8">
-        <div className="w-[200px] h-[200px]">
-          <PieChart 
-            data={pieChartData} 
-            options={{
-              plugins: {
-                legend: {
-                  display: false,
-                },
-              },
-            }}
-          />
-        </div>
-        <div className="space-y-4">
-          {pieChartData.labels.map((label, index) => (
-            <div key={label} className="flex items-center">
-              <div 
-                className="w-3 h-3 rounded-full mr-2" 
-                style={{ 
-                  backgroundColor: pieChartData.datasets[0].backgroundColor[index] 
-                }} 
+export const PieChartExample: Story = {
+  render: () => {
+    const total = pieChartData.reduce((sum, item) => sum + item.value, 0);
+    
+    return (
+      <Card className="w-[500px]">
+        <CardHeader>
+          <CardTitle>Traffic Sources</CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center gap-8">
+          <div className="w-[200px] h-[200px]">
+            <PieChart width={200} height={200}>
+              <Pie
+                data={pieChartData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={80}
+                paddingAngle={5}
+                dataKey="value"
+                nameKey="name"
+              >
+                {pieChartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip 
+                formatter={(value: number, name: string) => {
+                  const percentage = ((value / total) * 100).toFixed(1);
+                  return [`${value} (${percentage}%)`, name];
+                }}
               />
-              <span className="text-sm font-medium">{label}</span>
-              <span className="ml-auto text-sm text-muted-foreground">
-                {pieChartData.datasets[0].data[index]}%
-              </span>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  ),
+            </PieChart>
+          </div>
+          <div className="space-y-4">
+            {pieChartData.map((item, index) => (
+              <div key={item.name} className="flex items-center">
+                <div 
+                  className="w-3 h-3 rounded-full mr-2" 
+                  style={{ 
+                    backgroundColor: item.color
+                  }} 
+                />
+                <span className="text-sm font-medium">{item.name}</span>
+                <span className="ml-auto text-sm text-muted-foreground">
+                  {((item.value / total) * 100).toFixed(0)}%
+                </span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  },
 };
 
 // Area chart with gradient
-export const Area: Story = {
+export const AreaChartExample: Story = {
   render: () => (
     <Card className="w-[600px]">
       <CardHeader>
@@ -255,31 +418,45 @@ export const Area: Story = {
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
-          <AreaChart 
-            data={areaChartData} 
-            options={{
-              responsive: true,
-              maintainAspectRatio: false,
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  grid: {
-                    color: 'hsl(var(--border))',
-                  },
-                },
-                x: {
-                  grid: {
-                    display: false,
-                  },
-                },
-              },
-              plugins: {
-                legend: {
-                  display: false,
-                },
-              },
-            }}
-          />
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              data={areaChartData}
+              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
+                </linearGradient>
+              </defs>
+              <XAxis 
+                dataKey="name" 
+                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis 
+                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  borderColor: 'hsl(var(--border))',
+                  borderRadius: 'var(--radius)',
+                }}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="Users" 
+                stroke="hsl(var(--primary))" 
+                fillOpacity={1} 
+                fill="url(#colorUsers)" 
+              />
+            </AreaChart>
+          </ResponsiveContainer>
         </div>
       </CardContent>
     </Card>
@@ -287,7 +464,7 @@ export const Area: Story = {
 };
 
 // Radar chart for skill assessment
-export const Radar: Story = {
+export const RadarChartExample: Story = {
   render: () => (
     <Card className="w-[600px]">
       <CardHeader>
@@ -295,35 +472,42 @@ export const Radar: Story = {
       </CardHeader>
       <CardContent>
         <div className="h-[400px]">
-          <RadarChart 
-            data={radarChartData} 
-            options={{
-              responsive: true,
-              maintainAspectRatio: false,
-              scales: {
-                r: {
-                  angleLines: {
-                    color: 'hsl(var(--border))',
-                  },
-                  grid: {
-                    color: 'hsl(var(--border))',
-                  },
-                  pointLabels: {
-                    color: 'hsl(var(--foreground))',
-                  },
-                  ticks: {
-                    display: false,
-                    beginAtZero: true,
-                  },
-                },
-              },
-              plugins: {
-                legend: {
-                  position: 'top' as const,
-                },
-              },
-            }}
-          />
+          <ResponsiveContainer width="100%" height="100%">
+            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarChartData}>
+              <PolarGrid stroke="hsl(var(--border))" />
+              <PolarAngleAxis 
+                dataKey="subject" 
+                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+              />
+              <PolarRadiusAxis 
+                angle={30} 
+                domain={[0, 100]}
+                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+              />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  borderColor: 'hsl(var(--border))',
+                  borderRadius: 'var(--radius)',
+                }}
+              />
+              <Legend />
+              <Radar 
+                name="Skill Level" 
+                dataKey="Skill Level" 
+                stroke="hsl(var(--primary))" 
+                fill="hsl(var(--primary))" 
+                fillOpacity={0.3} 
+              />
+              <Radar 
+                name="Team Average" 
+                dataKey="Team Average" 
+                stroke="hsl(var(--muted-foreground))" 
+                fill="hsl(var(--muted-foreground))" 
+                fillOpacity={0.3} 
+              />
+            </RadarChart>
+          </ResponsiveContainer>
         </div>
       </CardContent>
     </Card>
@@ -331,7 +515,7 @@ export const Radar: Story = {
 };
 
 // Dashboard with multiple charts
-export const Dashboard: Story = {
+export const DashboardExample: Story = {
   render: () => (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -384,7 +568,32 @@ export const Dashboard: Story = {
           </CardHeader>
           <CardContent className="pl-2">
             <div className="h-[300px]">
-              <BarChart data={barChartData} />
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={barChartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis 
+                    dataKey="name" 
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis 
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--background))',
+                      borderColor: 'hsl(var(--border))',
+                      borderRadius: 'var(--radius)',
+                    }}
+                  />
+                  <Legend />
+                  <Bar dataKey="Revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="Expenses" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
@@ -421,7 +630,32 @@ export const Dashboard: Story = {
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
-              <PieChart data={pieChartData} />
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieChartData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {pieChartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--background))',
+                      borderColor: 'hsl(var(--border))',
+                      borderRadius: 'var(--radius)',
+                    }}
+                  />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>

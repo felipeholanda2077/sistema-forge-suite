@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from './input-otp';
 import { Button } from '../Button/button';
 import { Check, Loader2, RotateCw, ShieldAlert } from 'lucide-react';
@@ -80,7 +80,8 @@ export const WithValidation: Story = {
             variant="outline" 
             size="sm"
             onClick={() => {
-              const value = document.querySelector('input[type="text"]')?.value || '';
+              const input = document.querySelector('input[type="text"]') as HTMLInputElement | null;
+              const value = input?.value || '';
               const isValid = validateOTP(value);
               alert(isValid ? 'Verification successful!' : 'Invalid code. Please try again.');
             }}

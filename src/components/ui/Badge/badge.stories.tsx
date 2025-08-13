@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Badge } from './badge';
 import { Check, X, AlertTriangle, Bell, Star } from 'lucide-react';
 
@@ -30,7 +30,7 @@ export const Variants: Story = {
       <Badge variant="secondary">Secondary</Badge>
       <Badge variant="destructive">Destructive</Badge>
       <Badge variant="outline">Outline</Badge>
-      <Badge variant="success">Success</Badge>
+      <Badge variant="default">Success</Badge>
     </div>
   ),
 };
@@ -54,7 +54,7 @@ export const WithIcons: Story = {
         <AlertTriangle className="mr-1 h-3 w-3" />
         Warning
       </Badge>
-      <Badge variant="success">
+      <Badge variant="default">
         <Star className="mr-1 h-3 w-3 fill-current" />
         Featured
       </Badge>
