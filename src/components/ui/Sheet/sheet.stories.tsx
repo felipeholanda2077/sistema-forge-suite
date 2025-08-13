@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from './sheet';
 import { Button } from '../Button/button';
 import { Label } from '../Label/label';
@@ -12,6 +12,7 @@ import { Separator } from '../Separator/separator';
 import { Avatar, AvatarFallback } from '../Avatar/avatar';
 import { cn } from '../../../lib/utils';
 import { X, Plus, Filter, Search, Check, ChevronDown, ChevronUp, Settings, Bell, User, LogOut, CreditCard, LifeBuoy, MessageSquare } from 'lucide-react';
+import React from 'react';
 
 const meta: Meta<typeof Sheet> = {
   title: 'Components/Sheet',

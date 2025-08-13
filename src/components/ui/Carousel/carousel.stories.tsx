@@ -1,7 +1,6 @@
 // Using direct import with @ts-expect-error as a temporary solution
 // The project should install @storybook/react-vite for better Vite integration
-// @ts-expect-error - Using direct import as a fallback
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from './carousel';
 import { Card, CardContent } from '../Card/card';
 import { Button } from '../Button/button';

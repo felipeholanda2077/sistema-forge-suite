@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Toaster } from '../Toaster/toaster';
 import { Button } from '../Button/button';
 import { useToast } from '../use-toast';
@@ -53,7 +53,8 @@ const ToastDemo = () => {
           toast({
             title: 'Success!',
             description: 'Your changes have been saved.',
-            variant: 'success',
+            variant: 'default',
+            icon: <CheckCircle className="h-5 w-5 text-green-500" />
           });
         }}
       >
@@ -180,9 +181,7 @@ const ToastWithActions = () => {
       <Button
         variant="outline"
         onClick={() => {
-          const toastId = 'custom-id';
-          toast({
-            id: toastId,
+          const toastId = toast({
             title: 'Item added to cart',
             description: 'Check your cart to proceed to checkout.',
             action: (
@@ -371,8 +370,8 @@ const CustomToastContent = () => {
       variant="outline"
       onClick={() => {
         toast({
-          title: 'Custom Styled Toast',
-          description: 'This toast has custom styling.',
+          title: 'Custom Toast',
+          description: 'This is a toast with custom content.',
           className: 'border-l-4 border-blue-500',
           action: (
             <ToastAction altText="Dismiss">
@@ -424,10 +423,7 @@ const ToastWithCountdown = () => {
   const showCountdownToast = () => {
     setCountdown(5);
     
-    const toastId = 'countdown-toast';
-    
-    toast({
-      id: toastId,
+    const toastId = toast({
       title: 'Action required',
       description: `This will be automatically dismissed in ${countdown} seconds.`,
       duration: 6000,

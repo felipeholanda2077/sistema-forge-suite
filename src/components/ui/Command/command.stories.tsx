@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from './command';
 import { useState } from 'react';
 import { Check, ChevronsUpDown, Plus, Search, Settings, User, Users, LogOut, Moon, Sun, Laptop } from 'lucide-react';

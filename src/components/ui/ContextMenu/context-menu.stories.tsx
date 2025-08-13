@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuLabel, ContextMenuPortal, ContextMenuRadioGroup, ContextMenuRadioItem, ContextMenuSeparator, ContextMenuShortcut, ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger, ContextMenuTrigger } from './context-menu';
 import { Button } from '../Button/button';
 import { Check, ChevronRight, Copy, CreditCard, Edit, ExternalLink, Eye, File, FileText, Folder, MoreHorizontal, Plus, Save, Settings, Share, Star, Trash2, User, Zap } from 'lucide-react';

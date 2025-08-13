@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Slider } from './slider';
 import { useState } from 'react';
 import { Volume2, VolumeX, Sun, Moon, ZoomIn, ZoomOut } from 'lucide-react';
@@ -26,17 +26,21 @@ const meta: Meta<typeof Slider> = {
 export default meta;
 type Story = StoryObj<typeof Slider>;
 
-const SliderWithState = (args: any) => {
-  const [value, setValue] = useState(args.defaultValue || 50);
+interface SliderWithStateProps extends Omit<React.ComponentProps<typeof Slider>, 'value' | 'onValueChange'> {
+  defaultValue?: number[];
+}
+
+const SliderWithState = (args: SliderWithStateProps) => {
+  const [value, setValue] = useState<number[]>(args.defaultValue || [50]);
   return (
     <div className="w-full max-w-md">
       <Slider 
         {...args} 
-        value={[value]} 
-        onValueChange={([val]) => setValue(val)} 
+        value={value}
+        onValueChange={setValue}
       />
       <div className="mt-2 text-sm text-muted-foreground">
-        Value: {value}
+        Value: {value[0]}
       </div>
     </div>
   );
