@@ -35,9 +35,11 @@ const CacheMonitor: React.FC = () => {
       dispatch({
         type: 'UPDATE_CACHE_STATS',
         payload: {
-          hits: state.cacheStats.hits,
-          misses: state.cacheStats.misses,
+          hits: stats.hits,
+          misses: stats.misses,
           size: stats.size,
+          hitRate: stats.hitRate,
+          totalRequests: stats.totalRequests
         },
       });
     };
@@ -52,7 +54,13 @@ const CacheMonitor: React.FC = () => {
     setCacheDetails({ size: 0, maxSize: 200, keys: [] });
     dispatch({
       type: 'UPDATE_CACHE_STATS',
-      payload: { hits: 0, misses: 0, size: 0 },
+      payload: { 
+        hits: 0, 
+        misses: 0, 
+        size: 0, 
+        hitRate: 0, 
+        totalRequests: 0 
+      },
     });
   };
 
