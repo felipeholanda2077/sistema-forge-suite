@@ -6,7 +6,7 @@ dotenv.config();
 const connectDB = async () => {
   try {
     // MongoDB Atlas connection string with provided credentials
-    const connectionString = 'mongodb+srv://felipeholandafreitas:v6jaSWIzjjet7HHm@projeto-kirvano.qtilluf.mongodb.net/Projeto-Kirvano?retryWrites=true&w=majority&appName=Projeto-Kirvano';
+    const connectionString = process.env.MONGODB_URI ;
     
     await mongoose.connect(connectionString, {
       useNewUrlParser: true,

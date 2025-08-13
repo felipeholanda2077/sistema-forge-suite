@@ -13,23 +13,44 @@ import userFavoriteRoutes from './routes/userFavoriteRoutes.js';
 dotenv.config();
 
 // Create Express app
-const app = express();
 const PORT = process.env.PORT || 3002;
+
+// api/index.js
+const app = require('../backend/src/index');
+module.exports = app;
 
 // Connect to MongoDB
 connectDB();
 
 // CORS configuration
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3002',
+  'http://localhost:5173',
+  'http://localhost:8080',
+  'https://arcane-forge-suite.vercel.app',
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
 const corsOptions = {
-  origin: [
-    'http://localhost:3000', // Default React dev server
-    'http://localhost:3002', // Our frontend port
-    'http://localhost:5173', // Common Vite dev server
-    process.env.FRONTEND_URL // From environment variable if set
-  ].filter(Boolean),
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  origin: function (origin, callback) {
+    // Em produção, permita todas as origens
+    if (process.env.NODE_ENV === 'production') {
+      return callback(null, true);
+    }
+    
+    // Em desenvolvimento, verifique a lista de origens permitidas
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked for origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  credentials: true,
+  optionsSuccessStatus: 200
 };
 
 // Middleware
@@ -50,8 +71,8 @@ const router = express.Router();
 
 // Health check endpoint
 router.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'ok', 
+  res.status(200).json({
+    status: 'ok',
     message: 'Server is running',
     timestamp: new Date().toISOString(),
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
@@ -72,7 +93,7 @@ app.use('/api', router);
 
 // 404 handler for API routes
 app.use('/api/*', (req, res) => {
-  res.status(404).json({ 
+  res.status(404).json({
     success: false,
     error: {
       code: 'NOT_FOUND',
@@ -85,7 +106,7 @@ app.use('/api/*', (req, res) => {
 // Global error handler
 app.use((err, req, res, next) => {
   console.error(`[${new Date().toISOString()}] Error:`, err);
-  
+
   // Handle different types of errors
   const statusCode = err.statusCode || 500;
   const errorResponse = {
@@ -102,7 +123,7 @@ app.use((err, req, res, next) => {
 
 // Start server with error handling
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on http://localhost:${PORT}`);  
+  console.log(`Server is running on http://localhost:${PORT}`);
   console.log('Available endpoints:');
   console.log(`- GET  http://localhost:${PORT}/api/health`);
   console.log(`- POST http://localhost:${PORT}/api/users/register`);

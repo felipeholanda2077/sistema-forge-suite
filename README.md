@@ -31,7 +31,7 @@ Uma aplicação web moderna para explorar e gerenciar seus Pokémon favoritos, c
    ```env
    MONGODB_URI=mongodb://localhost:27017/kirvano
    JWT_SECRET=sua_chave_secreta_aqui
-   PORT=5000
+   PORT=3001
    # Configuração opcional do Redis
    REDIS_HOST=localhost
    REDIS_PORT=6379
@@ -62,7 +62,7 @@ Uma aplicação web moderna para explorar e gerenciar seus Pokémon favoritos, c
 
 3. Crie um arquivo `.env` no diretório do frontend:
    ```env
-   REACT_APP_API_URL=http://localhost:5000/api
+   REACT_APP_API_URL=http://localhost:3002/api
    ```
 
 4. Inicie o servidor de desenvolvimento:
@@ -72,7 +72,7 @@ Uma aplicação web moderna para explorar e gerenciar seus Pokémon favoritos, c
    yarn start
    ```
 
-5. Acesse [http://localhost:3000](http://localhost:3000) no seu navegador.
+5. Acesse [http://localhost:8080](http://localhost:8080) no seu navegador.
 
 ## 🏗️ Arquitetura
 
@@ -147,7 +147,7 @@ Este projeto está licenciado sob a Licença MIT - consulte o arquivo [LICENSE](
 - Ícones do [React Icons](https://react-icons.github.io/react-icons/)
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## What technologies are used for this project?
+## Quais tecnologias são usadas neste projeto?
 
 This project is built with:
 
