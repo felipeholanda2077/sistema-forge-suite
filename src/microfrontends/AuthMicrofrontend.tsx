@@ -12,11 +12,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs/t
 import { Badge } from '@/components/ui/Badge/badge';
 import { User, Mail, Lock, UserPlus, LogIn, Shield } from 'lucide-react';
 import { useMicrofrontend } from '@/contexts/MicrofrontendContext';
-import { useToast } from '@/hooks/use-toast';
+import { useCustomToast } from '@/hooks/useCustomToast';
 
 const AuthMicrofrontend: React.FC = () => {
   const { state, dispatch } = useMicrofrontend();
-  const { toast } = useToast();
+  const { showToast } = useCustomToast();
   const [isLoading, setIsLoading] = useState(false);
 
   // Função de login demo (em uma aplicação real, chamaria o Supabase)
@@ -36,9 +36,9 @@ const AuthMicrofrontend: React.FC = () => {
     
     dispatch({ type: 'SET_USER', payload: demoUser });
     
-    toast({
+    showToast({
       title: '🎉 Bem-vindo de volta!',
-      description: 'Login realizado com sucesso.',
+      description: 'Login realizado com sucesso.'
     });
     
     setIsLoading(false);
@@ -59,9 +59,9 @@ const AuthMicrofrontend: React.FC = () => {
     
     dispatch({ type: 'SET_USER', payload: newUser });
     
-    toast({
+    showToast({
       title: '✅ Conta criada!',
-      description: 'Bem-vindo ao Explorador Pokémon!',
+      description: 'Bem-vindo ao Explorador Pokémon!'
     });
     
     setIsLoading(false);
@@ -69,9 +69,9 @@ const AuthMicrofrontend: React.FC = () => {
 
   const handleLogout = () => {
     dispatch({ type: 'LOGOUT' });
-    toast({
+    showToast({
       title: '👋 Até logo!',
-      description: 'Volte sempre que quiser explorar mais Pokémon!',
+      description: 'Volte sempre que quiser explorar mais Pokémon!'
     });
   };
 
