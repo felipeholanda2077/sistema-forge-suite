@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://backend-sitema-forge-suite.vercel.app/api';
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002/api';
 
 interface ApiErrorResponse {
   data: {
