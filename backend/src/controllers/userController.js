@@ -97,6 +97,16 @@ export const loginUser = async (req, res, next) => {
       });
     }
     
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: process.env.JWT_EXPIRES_IN || '30d' }
+    );
+
+    // Update last login time
+    await user.updateLastLogin();
+
     // Remove password from response
     const userResponse = user.toObject();
     delete userResponse.password;

@@ -8,7 +8,7 @@ const connectDB = async () => {
     console.log('Attempting to connect to MongoDB...');
     
     // Get MongoDB URI from environment variable or use the hardcoded one as fallback
-    const connectionString = process.env.MONGODB_URI || "mongodb+srv://felipeholandafreitas:cWP78Nnt3b1tMb96@projeto-kirvano.qtilluf.mongodb.net/Projeto-Kirvano?retryWrites=true&w=majority";
+    const connectionString = process.env.MONGODB_URI || "mongodb+srv://felipeholandafreitas:1wBez9L7Y13Udizw@projeto-kirvano.qtilluf.mongodb.net/Projeto-Kirvano?retryWrites=true&w=majority&appName=Projeto-Kirvano";
     
     if (!connectionString) {
       throw new Error('MongoDB connection string is not defined');
@@ -19,10 +19,10 @@ const connectDB = async () => {
     console.log('Connecting to MongoDB with URI:', maskedConnectionString);
     
     const connection = await mongoose.connect(connectionString, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
+      maxPoolSize: 10, // Maximum number of connections in the connection pool
+      connectTimeoutMS: 10000, // Time to wait for connection to be established
     });
     
     console.log('MongoDB connected successfully');
