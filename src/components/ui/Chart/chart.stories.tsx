@@ -47,12 +47,12 @@ import { ArrowUp, ArrowDown, TrendingUp, BarChart as BarChartIcon, PieChart as P
 import { cn } from '@/lib/utils';
 
 // Define the meta configuration for Storybook
-const meta = {
+const meta: Meta<typeof LineChart> = {
   title: 'Components/Chart',
   component: LineChart,
-  tags: ['autodocs'] as const,
+  tags: ['autodocs'],
   parameters: {
-    layout: 'centered' as const,
+    layout: 'centered',
   },
   // Add argTypes for better controls in Storybook
   argTypes: {
