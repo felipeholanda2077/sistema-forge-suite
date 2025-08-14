@@ -6,7 +6,6 @@
 import React from 'react';
 import { MicrofrontendProvider } from '@/contexts/MicrofrontendContext';
 import { PageHeader } from '@/components/PageHeader';
-import CacheMonitor from '@/components/CacheMonitor';
 import AuthMicrofrontend from '@/microfrontends/AuthMicrofrontend';
 import PokemonMicrofrontend from '@/microfrontends/PokemonMicrofrontend';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card/card';
@@ -33,10 +32,10 @@ const Index = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Layers className="w-6 h-6" />
-                🏗️ Visão Geral da Implementação Técnica
+                🎮 POKÉDEX DIGITAL - VISÃO TÉCNICA
               </CardTitle>
               <CardDescription>
-                Demonstração profissional de arquitetura de microfrontends com integração de API externa e estratégias avançadas de cache
+                Aplicação web moderna integrando a PokeAPI com cache inteligente e gerenciamento de estado avançado
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -44,10 +43,10 @@ const Index = () => {
                 <div className="p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg space-y-2 border border-primary/20 hover:scale-105 transition-bounce">
                   <div className="flex items-center gap-2">
                     <Shield className="w-5 h-5 text-primary" />
-                    <span className="font-semibold">🔐 Microfrontend de Auth</span>
+                    <span className="font-semibold">🔒 Autenticação Segura</span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Sistema isolado de autenticação com gerenciamento de sessão
+                    Sistema de login com JWT e gerenciamento de sessão
                   </p>
                   <Badge variant="outline" className="text-xs">
                     <CheckCircle className="w-3 h-3 mr-1" />
@@ -58,10 +57,10 @@ const Index = () => {
                 <div className="p-4 bg-muted rounded-lg space-y-2">
                   <div className="flex items-center gap-2">
                     <Database className="w-5 h-5 text-primary" />
-                    <span className="font-semibold">Pokemon API MF</span>
+                    <span className="font-semibold">🌐 Integração PokeAPI</span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    External API integration with PokeAPI and intelligent caching
+                    Busca e exibição de dados de Pokémon da API oficial
                   </p>
                   <Badge variant="outline" className="text-xs">
                     <CheckCircle className="w-3 h-3 mr-1" />
@@ -72,10 +71,10 @@ const Index = () => {
                 <div className="p-4 bg-muted rounded-lg space-y-2">
                   <div className="flex items-center gap-2">
                     <Zap className="w-5 h-5 text-primary" />
-                    <span className="font-semibold">Cache Strategy</span>
+                    <span className="font-semibold">⚡ Cache Otimizado</span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    TTL-based caching with size limits and performance monitoring
+                    Cache gerenciado pelo backend para melhor desempenho
                   </p>
                   <Badge variant="outline" className="text-xs">
                     <CheckCircle className="w-3 h-3 mr-1" />
@@ -86,10 +85,10 @@ const Index = () => {
                 <div className="p-4 bg-muted rounded-lg space-y-2">
                   <div className="flex items-center gap-2">
                     <GitBranch className="w-5 h-5 text-primary" />
-                    <span className="font-semibold">State Sharing</span>
+                    <span className="font-semibold">🔄 Favoritos</span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Cross-microfrontend communication via shared context
+                    Sistema de favoritos persistente com MongoDB
                   </p>
                   <Badge variant="outline" className="text-xs">
                     <CheckCircle className="w-3 h-3 mr-1" />
@@ -99,9 +98,6 @@ const Index = () => {
               </div>
             </CardContent>
           </Card>
-
-          {/* Cache Performance Monitor */}
-          <CacheMonitor />
 
             {/* Layout dos Microfrontends */}
             <div className=" grid-cols-2 lg:grid-cols-3 gap-8">

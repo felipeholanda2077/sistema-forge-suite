@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL =  'https://back-end-projetokirvano-b30617960bd0.herokuapp.com/api';
+const API_BASE_URL = 'https://back-end-projetokirvano-b30617960bd0.herokuapp.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -9,7 +9,21 @@ const api = axios.create({
   },
 });
 
-// Add response interceptor to handle caching headers
+// Add request interceptor to include auth token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor to handle caching headers and authentication errors
 api.interceptors.response.use(
   (response) => {
     // You can access cache headers here if needed
@@ -17,6 +31,13 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    // Handle 401 Unauthorized errors
+    if (error.response && error.response.status === 401) {
+      // Optionally: Clear auth data and redirect to login
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userData');
+      window.location.href = '/login';
+    }
     return Promise.reject(error);
   }
 );

@@ -1,6 +1,5 @@
 import express from 'express';
 import { body, param } from 'express-validator';
-import { authenticateToken } from '../middleware/auth.js';
 import { 
   getUserFavorites, 
   toggleFavorite, 
@@ -9,23 +8,23 @@ import {
 
 const router = express.Router();
 
-// Middleware to protect all favorite routes
-router.use(authenticateToken);
+// Todas as rotas de favoritos agora funcionam sem autenticação
+// usando 'anonymous' como ID de usuário quando não houver autenticação
 
-// Get all favorites for the authenticated user
-router.get('/', getUserFavorites);
-
-// Toggle favorite status for a Pokémon
+// Toggle favorite status
 router.post(
   '/toggle',
   [
-    body('pokemonData').isObject().withMessage('Dados do Pokémon são obrigatórios'),
-    body('pokemonData.id').isNumeric().withMessage('ID do Pokémon é inválido')
+    body('pokemon').isObject().withMessage('Dados do Pokémon são obrigatórios'),
+    body('pokemon.id').isNumeric().withMessage('ID do Pokémon é inválido')
   ],
   toggleFavorite
 );
 
-// Check if a specific Pokémon is favorited by the user
+// Get all favorites for the user (ou anonymous)
+router.get('/', getUserFavorites);
+
+// Check if a specific Pokémon is favorited by the user (ou anonymous)
 router.get(
   '/check/:pokemonId',
   [

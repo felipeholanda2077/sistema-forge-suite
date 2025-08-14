@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import UserFavorite from '../models/UserFavorite.js';
 import { validationResult } from 'express-validator';
 
@@ -26,17 +27,10 @@ const extractEssentialPokemonData = (pokemon) => ({
 
 export const getUserFavorites = async (req, res, next) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'Usuário não autenticado'
-        }
-      });
-    }
-
-    const favorites = await UserFavorite.find({ userId: req.user.id });
+    // Usar o ID do usuário autenticado ou 'anonymous' se não estiver autenticado
+    const userId = req.user?.id || 'anonymous';
+    
+    const favorites = await UserFavorite.find({ userId });
     
     // Map to ensure we only return essential data
     const simplifiedFavorites = favorites.map(fav => ({
@@ -67,18 +61,10 @@ export const toggleFavorite = async (req, res, next) => {
       });
     }
 
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'Usuário não autenticado'
-        }
-      });
-    }
-
     const { pokemon } = req.body;
-    const userId = req.user.id;
+    
+    // Usar o ID do usuário autenticado ou 'anonymous' se não estiver autenticado
+    const userId = req.user?.id || 'anonymous';
 
     if (!pokemon || !pokemon.id) {
       return res.status(400).json({ 
@@ -92,8 +78,9 @@ export const toggleFavorite = async (req, res, next) => {
 
     const essentialData = extractEssentialPokemonData(pokemon);
 
+    // Como estamos usando um ID de usuário fixo 'anonymous', não precisamos converter para ObjectId
     let favorite = await UserFavorite.findOne({ 
-      userId: new mongoose.Types.ObjectId(userId),
+      userId: userId,
       'pokemonData.id': pokemon.id
     });
 
@@ -156,7 +143,9 @@ export const isPokemonFavorited = async (req, res, next) => {
       });
     }
 
-    const isFavorited = await UserFavorite.isFavorited(req.user.id, pokemonId);
+    // Usar o ID do usuário autenticado ou 'anonymous' se não estiver autenticado
+    const userId = req.user?.id || 'anonymous';
+    const isFavorited = await UserFavorite.isFavorited(userId, pokemonId);
     
     res.status(200).json({
       success: true,

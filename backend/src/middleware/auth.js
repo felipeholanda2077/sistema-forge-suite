@@ -1,58 +1,47 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
+// Middleware que permite a continuação mesmo sem token
+// Usa 'anonymous' como ID de usuário quando não há token
+// ou quando o token é inválido
 export const authenticateToken = (req, res, next) => {
   // Get token from header
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
+  // Se não houver token, continua como usuário anônimo
   if (!token) {
-    return res.status(401).json({
-      success: false,
-      error: {
-        code: 'UNAUTHORIZED',
-        message: 'Token de autenticação não fornecido'
-      }
-    });
+    req.user = { id: 'anonymous' };
+    return next();
   }
 
-  // Verify token
+  // Verifica o token, mas continua mesmo se for inválido
   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-    if (err) {
-      return res.status(403).json({
-        success: false,
-        error: {
-          code: 'INVALID_TOKEN',
-          message: 'Token inválido ou expirado'
-        }
-      });
-    }
-
     try {
-      // Find user and attach to request
+      if (err) {
+        // Token inválido, continua como anônimo
+        req.user = { id: 'anonymous' };
+        return next();
+      }
+
+      // Tenta encontrar o usuário
       const user = await User.findById(decoded.userId).select('-password');
       
       if (!user) {
-        return res.status(404).json({
-          success: false,
-          error: {
-            code: 'USER_NOT_FOUND',
-            message: 'Usuário não encontrado'
-          }
-        });
+        // Usuário não encontrado, continua como anônimo
+        req.user = { id: 'anonymous' };
+        return next();
       }
 
+      // Usuário autenticado com sucesso
       req.user = user;
       next();
     } catch (error) {
       console.error('Erro na autenticação:', error);
-      res.status(500).json({
-        success: false,
-        error: {
-          code: 'AUTH_ERROR',
-          message: 'Erro ao autenticar usuário'
-        }
-      });
+      // Em caso de erro, continua como anônimo
+      console.error('Erro na autenticação:', error);
+      req.user = { id: 'anonymous' };
+      next();
     }
   });
 };

@@ -23,15 +23,6 @@ interface AppState {
   // Pokemon microfrontend state
   favoritePokemons: Pokemon[];
   searchHistory: string[];
-  
-  // Cache statistics
-  cacheStats: {
-    hits: number;
-    misses: number;
-    size: number;
-    hitRate: number;
-    totalRequests: number;
-  };
 }
 
 // Action types for state management
@@ -41,30 +32,13 @@ type AppAction =
   | { type: 'ADD_FAVORITE_POKEMON'; payload: Pokemon }
   | { type: 'REMOVE_FAVORITE_POKEMON'; payload: number }
   | { type: 'SET_FAVORITE_POKEMONS'; payload: Pokemon[] }
-  | { type: 'ADD_SEARCH_TERM'; payload: string }
-  | { 
-      type: 'UPDATE_CACHE_STATS'; 
-      payload: { 
-        hits: number; 
-        misses: number; 
-        size: number;
-        hitRate: number;
-        totalRequests: number;
-      } 
-    };
+  | { type: 'ADD_SEARCH_TERM'; payload: string };
 
 const initialState: AppState = {
   user: null,
   isAuthenticated: false,
   favoritePokemons: [],
   searchHistory: [],
-  cacheStats: {
-    hits: 0,
-    misses: 0,
-    size: 0,
-    hitRate: 0,
-    totalRequests: 0,
-  },
 };
 
 // Reducer for state management
@@ -106,19 +80,10 @@ function appReducer(state: AppState, action: AppAction): AppState {
         favoritePokemons: action.payload,
       };
     
-    case 'ADD_SEARCH_TERM': {
-      const filteredHistory = state.searchHistory.filter(term => term !== action.payload);
-      const newHistory = [action.payload, ...filteredHistory].slice(0, 10);
+    case 'ADD_SEARCH_TERM':
       return {
         ...state,
-        searchHistory: newHistory,
-      };
-    }
-    
-    case 'UPDATE_CACHE_STATS':
-      return {
-        ...state,
-        cacheStats: action.payload,
+        searchHistory: [action.payload, ...state.searchHistory].slice(0, 10) // Keep last 10 searches
       };
     
     default:

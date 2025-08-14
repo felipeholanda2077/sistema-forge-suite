@@ -43,24 +43,69 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = (token: string, userData?: UserData) => {
     console.log('AuthProvider - login - Setting auth token in localStorage');
+    console.log('Token to be stored:', token);
     localStorage.setItem('authToken', token);
     
     if (userData) {
+      console.log('User data to be stored:', userData);
       localStorage.setItem('userData', JSON.stringify(userData));
+      
+      // Atualiza o estado do usuário imediatamente
+      const user = userData;
+      
+      // Garante que favoritePokemons seja um array de números (IDs)
+      let favoritePokemonIds: number[] = [];
+      if (user.favoritePokemons && Array.isArray(user.favoritePokemons)) {
+        favoritePokemonIds = user.favoritePokemons
+          .map(fav => {
+            if (typeof fav === 'number') return fav;
+            if (fav && typeof fav === 'object' && 'id' in fav) return fav.id;
+            return null;
+          })
+          .filter((id): id is number => id !== null);
+      }
+      
+      console.log('Dispatching SET_USER with payload:', {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        favoritePokemons: favoritePokemonIds
+      });
+      
+      dispatch({ 
+        type: 'SET_USER', 
+        payload: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          favoritePokemons: favoritePokemonIds
+        } 
+      });
+    } else {
+      console.log('No user data provided to login function');
     }
     
     console.log('AuthProvider - login - Setting isAuthenticated to true');
-    // Force a new render cycle to ensure state is updated
-    setTimeout(() => {
-      console.log('AuthProvider - login - Forcing state update');
-      setIsAuthenticated(true);
-    }, 0);
+    // Atualiza o estado de autenticação imediatamente
+    setIsAuthenticated(true);
+    console.log('isAuthenticated state updated to true');
   };
 
   const logout = () => {
+    console.log('AuthProvider - logout - Removing auth data from localStorage');
+    
+    // Remove todos os itens relacionados à autenticação
     localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('userData');
+    
+    // Limpa os dados do usuário no estado global
+    dispatch({ type: 'LOGOUT' });
+    
+    // Atualiza o estado de autenticação
     setIsAuthenticated(false);
+    
+    console.log('AuthProvider - logout - Logout completed');
   };
 
   const value: AuthContextType = {

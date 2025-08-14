@@ -32,23 +32,20 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Em produção, permita todas as origens
+    // Em produção, permita apenas origens específicas
     if (process.env.NODE_ENV === 'production') {
-      return callback(null, true);
+      return callback(null, allowedOrigins);
     }
     
-    // Em desenvolvimento, verifique a lista de origens permitidas
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.warn(`CORS blocked for origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
+    // Em desenvolvimento, permita todas as origens para facilitar o desenvolvimento
+    callback(null, true);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'x-access-token'],
+  exposedHeaders: ['Content-Range', 'X-Total-Count'],
   credentials: true,
-  optionsSuccessStatus: 200
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
 // Middleware

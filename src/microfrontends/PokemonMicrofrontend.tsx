@@ -24,7 +24,6 @@ import { pokemonApi, Pokemon, getPokemonTypeColor } from '@/services/pokemonApi'
 import { useMicrofrontend } from '@/contexts/MicrofrontendContext';
 import { useAuth } from '@/hooks/useAuth';
 import { mongoFavoriteService } from '@/services/mongoFavoriteService';
-import { apiCache } from '@/lib/cache';
 import { toast as _toast } from '@/hooks/use-toast';
 
 // Type assertion to ensure toast is callable
@@ -99,26 +98,8 @@ const PokemonMicrofrontend: React.FC = () => {
     loadFavorites();
   }, [isAuthenticated, dispatch]);
 
-  // Atualiza estatísticas do cache periodicamente
-  useEffect(() => {
-    const updateCacheStats = () => {
-      const stats = apiCache.getStats();
-      dispatch({
-        type: 'UPDATE_CACHE_STATS',
-        payload: {
-          hits: stats.hits || 0,
-          misses: stats.misses || 0,
-          size: stats.size || 0,
-          hitRate: stats.hitRate || 0,
-          totalRequests: stats.totalRequests || 0
-        },
-      });
-    };
-
-    updateCacheStats();
-    const interval = setInterval(updateCacheStats, 2000); // Atualiza a cada 2 segundos
-    return () => clearInterval(interval);
-  }, [dispatch]);
+  // Cache is now handled by the backend
+  // No need for frontend cache status updates
 
   const handleSearch = async () => {
     if (!searchTerm.trim()) return;
@@ -178,24 +159,72 @@ const PokemonMicrofrontend: React.FC = () => {
 
 
 
-  // Load favorites when component mounts or when authentication state changes
+  // Load favorites when component mounts, when authentication state changes, or when the tab becomes visible
   useEffect(() => {
     const loadFavorites = async () => {
-      // Se não estiver autenticado, limpa os favoritos e não tenta carregar
+      console.log('Iniciando carregamento de favoritos...', { isAuthenticated });
+      
+      // If not authenticated, clear favorites and don't try to load
       if (!isAuthenticated) {
+        console.log('Usuário não autenticado, limpando favoritos');
         dispatch({ type: 'SET_FAVORITE_POKEMONS', payload: [] });
         return;
       }
 
       try {
-        console.log('Carregando favoritos para o usuário autenticado...');
+        console.log('Buscando favoritos do usuário autenticado...');
         const favorites = await mongoFavoriteService.getFavorites();
-        console.log('Favoritos carregados com sucesso:', favorites);
-        dispatch({ type: 'SET_FAVORITE_POKEMONS', payload: favorites });
-      } catch (error: unknown) {
-        console.error('Error loading favorites:', error);
+        console.log('Favoritos recebidos da API:', favorites);
         
-        // Definindo um tipo para o erro que esperamos
+        if (!Array.isArray(favorites)) {
+          throw new Error('Formato de resposta inválido dos favoritos');
+        }
+        
+        // Mapeia os favoritos para garantir que tenham o formato correto
+        const validFavorites = favorites
+          .map(pokemon => {
+            if (!pokemon || !pokemon.id || !pokemon.name) {
+              console.warn('Pokémon inválido encontrado:', pokemon);
+              return null;
+            }
+            return {
+              ...pokemon,
+              // Garante que os sprites estejam sempre definidos
+              sprites: {
+                front_default: pokemon.sprites?.front_default || '',
+                front_shiny: pokemon.sprites?.front_shiny || '',
+                back_default: pokemon.sprites?.back_default || '',
+                back_shiny: pokemon.sprites?.back_shiny || '',
+                other: {
+                  'official-artwork': {
+                    front_default: pokemon.sprites?.other?.['official-artwork']?.front_default || 
+                                  pokemon.sprites?.front_default ||
+                                  ''
+                  }
+                }
+              },
+              types: Array.isArray(pokemon.types) ? pokemon.types : [],
+              abilities: Array.isArray(pokemon.abilities) ? pokemon.abilities : [],
+              stats: Array.isArray(pokemon.stats) ? pokemon.stats : [],
+              height: pokemon.height || 0,
+              weight: pokemon.weight || 0,
+              base_experience: pokemon.base_experience || 0
+            };
+          })
+          .filter(Boolean); // Remove quaisquer valores nulos
+          
+        console.log('Favoritos válidos processados:', validFavorites);
+        
+        // Atualiza o estado com os favoritos válidos
+        dispatch({ 
+          type: 'SET_FAVORITE_POKEMONS', 
+          payload: validFavorites 
+        });
+        
+      } catch (error: unknown) {
+        console.error('Erro ao carregar favoritos:', error);
+        
+        // Define o tipo para o erro esperado
         type ApiError = {
           response?: {
             status?: number;
@@ -212,7 +241,7 @@ const PokemonMicrofrontend: React.FC = () => {
         
         const apiError = error as ApiError;
         
-        // Se for erro de autenticação, limpa os favoritos
+        // Se for um erro de autenticação, limpa os favoritos
         if (apiError.response?.status === 401) {
           dispatch({ type: 'SET_FAVORITE_POKEMONS', payload: [] });
           toast({
@@ -221,17 +250,34 @@ const PokemonMicrofrontend: React.FC = () => {
             variant: 'destructive',
           });
         } else {
+          console.error('Erro ao carregar favoritos:', error);
           toast({
             title: '❌ Erro',
-            description: 'Não foi possível carregar seus Pokémon favoritos.',
+            description: 'Não foi possível carregar seus Pokémon favoritos. Tente novamente mais tarde.',
             variant: 'destructive',
           });
         }
       }
     };
 
+    // Carrega os favoritos imediatamente
     loadFavorites();
-  }, [isAuthenticated]); // Recarrega quando o estado de autenticação mudar
+    
+    // Configura um event listener para recarregar quando a aba se tornar visível
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('A aba está visível, recarregando favoritos...');
+        loadFavorites();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Limpa o event listener quando o componente é desmontado
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isAuthenticated, dispatch]); // Adiciona dispatch como dependência
 
   const toggleFavorite = async (pokemon: Pokemon) => {
     if (isTogglingFavorite) return;
@@ -518,8 +564,9 @@ const PokemonMicrofrontend: React.FC = () => {
             </CardHeader>
             <CardContent>
               {isLoadingFavorites ? (
-                <div className="flex justify-center items-center py-12">
-                  <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                  <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                  <p className="text-muted-foreground">Carregando seus Pokémon favoritos...</p>
                 </div>
               ) : state.favoritePokemons.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground animate-fade-in">
@@ -532,7 +579,7 @@ const PokemonMicrofrontend: React.FC = () => {
                       ? 'Explore e descubra Pokémon incríveis para adicionar aos seus favoritos!' 
                       : 'Adicione Pokémon aos favoritos para vê-los aqui!'}
                   </p>
-                  {!isAuthenticated && (
+                  {!isAuthenticated ? (
                     <Button 
                       variant="outline" 
                       onClick={() => window.location.href = '/login'}
@@ -540,42 +587,66 @@ const PokemonMicrofrontend: React.FC = () => {
                     >
                       Fazer login para salvar sua coleção
                     </Button>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      onClick={() => document.getElementById('search-tab')?.click()}
+                      className="mt-2"
+                    >
+                      🔍 Procurar Pokémon
+                    </Button>
                   )}
                 </div>
               ) : (
-                <div>
-                  <div className="mb-4 text-sm text-muted-foreground">
-                    Mostrando {state.favoritePokemons.length} Pokémon{state.favoritePokemons.length !== 1 ? 's' : ''} favoritado{state.favoritePokemons.length !== 1 ? 's' : ''}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="text-sm text-muted-foreground">
+                      {state.favoritePokemons.length} Pokémon{state.favoritePokemons.length !== 1 ? 's' : ''} favoritado{state.favoritePokemons.length !== 1 ? 's' : ''}
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => document.getElementById('search-tab')?.click()}
+                      className="flex items-center gap-1"
+                    >
+                      <Search className="w-4 h-4" />
+                      Adicionar mais
+                    </Button>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {state.favoritePokemons
-                      .filter(pokemon => pokemon && pokemon.id && pokemon.name) // Filter out invalid Pokemon
-                      .map((pokemon, index) => {
-                        console.log(`Renderizando Pokémon favorito ${index + 1}/${state.favoritePokemons.length}:`, pokemon);
-                        return (
-                          <div 
-                            key={`favorite-${pokemon.id}-${index}`} 
-                            className="animate-fade-in bg-card rounded-lg border overflow-hidden hover:shadow-md transition-shadow"
-                            style={{ animationDelay: `${index * 0.1}s` }}
-                          >
-                            <PokemonCard
-                              key={`favorite-card-${pokemon.id}`}
-                              pokemon={pokemon}
-                              isFavorite={true}
-                              onToggleFavorite={() => toggleFavorite(pokemon)}
-                              featured={index === 0} // Destaque para o primeiro Pokémon
-                            />
-                          </div>
-                        );
-                      })
+                      .filter(pokemon => pokemon && pokemon.id && pokemon.name)
+                      .map((pokemon, index) => (
+                        <div 
+                          key={`favorite-${pokemon.id}-${index}`}
+                          className="animate-fade-in"
+                          style={{ animationDelay: `${index * 0.05}s` }}
+                        >
+                          <PokemonCard
+                            pokemon={pokemon}
+                            isFavorite={true}
+                            onToggleFavorite={() => toggleFavorite(pokemon)}
+                            featured={index === 0}
+                          />
+                        </div>
+                      ))
                     }
-                    {state.favoritePokemons.filter(p => p && p.id && p.name).length === 0 && (
-                      <div className="col-span-full text-center py-8 text-muted-foreground">
-                        <p>Nenhum Pokémon favorito válido encontrado.</p>
-                        <p className="text-sm mt-2">Tente adicionar alguns Pokémon aos favoritos novamente.</p>
-                      </div>
-                    )}
                   </div>
+                  
+                  {state.favoritePokemons.filter(p => p && p.id && p.name).length === 0 && (
+                    <div className="col-span-full text-center py-8 text-muted-foreground">
+                      <p>Nenhum Pokémon favorito válido encontrado.</p>
+                      <p className="text-sm mt-2">Tente adicionar alguns Pokémon aos favoritos novamente.</p>
+                      <Button 
+                        variant="outline" 
+                        className="mt-4"
+                        onClick={() => document.getElementById('search-tab')?.click()}
+                      >
+                        🔍 Procurar Pokémon
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>
@@ -756,8 +827,8 @@ const PokemonCard: React.FC<PokemonCardProps> = ({
           </div>
         </div>
 
-        {/* Habilidades (apenas para o Pokémon em destaque) */}
-        {featured && pokemon.abilities && pokemon.abilities.length > 0 && (
+        {/* Habilidades */}
+        {pokemon.abilities && pokemon.abilities.length > 0 && (
           <div className="mt-auto pt-3 border-t border-border">
             <div className="text-sm font-medium text-foreground/90 mb-2 flex items-center">
               <Zap className="w-4 h-4 mr-1.5 text-yellow-500" />

@@ -1,9 +1,10 @@
 /**
- * Pokemon API service with professional caching strategy
- * Demonstrates external API integration as required by technical test
+ * Pokemon API service
+ * Handles all communication with the PokeAPI
+ * Caching is now handled by the backend
  */
 
-import { cachedFetch } from '@/lib/cache';
+import { apiFetch } from '@/lib/cache';
 
 const POKEMON_API_BASE = 'https://pokeapi.co/api/v2';
 
@@ -94,14 +95,7 @@ class PokemonApiService {
    */
   async getPokemonList(limit = 20, offset = 0): Promise<PokemonListResponse> {
     const url = `${POKEMON_API_BASE}/pokemon?limit=${limit}&offset=${offset}`;
-    const cacheKey = `pokemon-list-${limit}-${offset}`;
-    
-    return cachedFetch<PokemonListResponse>(
-      url,
-      undefined,
-      cacheKey,
-      10 * 60 * 1000 // Cache for 10 minutes
-    );
+    return apiFetch<PokemonListResponse>(url);
   }
 
   /**
@@ -109,14 +103,7 @@ class PokemonApiService {
    */
   async getPokemon(nameOrId: string | number): Promise<Pokemon> {
     const url = `${POKEMON_API_BASE}/pokemon/${nameOrId}`;
-    const cacheKey = `pokemon-${nameOrId}`;
-    
-    return cachedFetch<Pokemon>(
-      url,
-      undefined,
-      cacheKey,
-      30 * 60 * 1000 // Cache for 30 minutes
-    );
+    return apiFetch<Pokemon>(url);
   }
 
   /**
@@ -124,14 +111,7 @@ class PokemonApiService {
    */
   async getPokemonSpecies(nameOrId: string | number): Promise<PokemonSpecies> {
     const url = `${POKEMON_API_BASE}/pokemon-species/${nameOrId}`;
-    const cacheKey = `pokemon-species-${nameOrId}`;
-    
-    return cachedFetch<PokemonSpecies>(
-      url,
-      undefined,
-      cacheKey,
-      30 * 60 * 1000 // Cache for 30 minutes
-    );
+    return apiFetch<PokemonSpecies>(url);
   }
 
   /**
@@ -176,23 +156,17 @@ class PokemonApiService {
    */
   async getPokemonByType(type: string): Promise<Pokemon[]> {
     const url = `${POKEMON_API_BASE}/type/${type}`;
-    const cacheKey = `pokemon-type-${type}`;
     
-    const typeData = await cachedFetch<{
-      pokemon: Array<{ pokemon: { name: string; url: string } }>;
-    }>(
-      url,
-      undefined,
-      cacheKey,
-      15 * 60 * 1000 // Cache for 15 minutes
-    );
-
-    // Get first 20 Pokemon of this type
-    const pokemonPromises = typeData.pokemon
-      .slice(0, 20)
-      .map(entry => this.getPokemon(entry.pokemon.name));
-
     try {
+      const typeData = await apiFetch<{
+        pokemon: Array<{ pokemon: { name: string; url: string } }>;
+      }>(url);
+
+      // Get first 20 Pokemon of this type
+      const pokemonPromises = typeData.pokemon
+        .slice(0, 20)
+        .map(entry => this.getPokemon(entry.pokemon.name));
+
       return await Promise.all(pokemonPromises);
     } catch (error) {
       console.error('Error fetching Pokemon by type:', error);
