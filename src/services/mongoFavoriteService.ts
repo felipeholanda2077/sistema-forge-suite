@@ -256,9 +256,10 @@ const mapPokemonData = (data: PokemonData): Pokemon => {
 export const mongoFavoriteService = {
   // Get user-specific favorites
   async getFavoritesForUser(userId: string): Promise<Pokemon[]> {
-    if (!userId) {
-      console.error('No user ID provided to getFavoritesForUser');
-      return [];
+    // Reject empty or 'anonymous' user IDs
+    if (!userId || userId === 'anonymous') {
+      console.error('Invalid or missing user ID provided to getFavoritesForUser:', userId);
+      throw new Error('ID de usuário inválido ou não autenticado');
     }
 
     console.log(`[getFavoritesForUser] Fetching favorites for user: ${userId}`);
@@ -361,14 +362,53 @@ export const mongoFavoriteService = {
   // Get favorites for the current user
   async getFavorites(): Promise<Pokemon[]> {
     const userId = getUserIdFromToken();
-    if (!userId) return [];
-    return this.getFavoritesForUser(userId);
+    
+    // If no user ID or it's 'anonymous', return empty array
+    if (!userId || userId === 'anonymous') {
+      console.log('[getFavorites] No valid user ID, returning empty favorites');
+      return [];
+    }
+    
+    try {
+      return await this.getFavoritesForUser(userId);
+    } catch (error) {
+      console.error('[getFavorites] Error fetching favorites:', error);
+      return [];
+    }
   },
 
-  async toggleFavorite(pokemon: Pokemon): Promise<{ isFavorited: boolean }> {
+  async toggleFavorite(pokemon: Pokemon): Promise<{ isFavorited: boolean; error?: string }> {
     const userId = getUserIdFromToken();
-    if (!userId) {
-      throw new Error('User ID not found in token');
+    
+    // Ensure we have a valid user ID and it's not 'anonymous'
+    if (!userId || userId === 'anonymous') {
+      console.error('Invalid or missing user ID in token');
+      throw new Error('Você precisa estar autenticado para favoritar um Pokémon');
+    }
+    
+    console.log(`[toggleFavorite] Toggling favorite for user: ${userId}, Pokémon: ${pokemon.id}`);
+
+    // First, check if the Pokémon is already favorited by any user
+    try {
+      const checkResponse = await fetchWithAuth(`${API_BASE_URL}/favorites/check-global/${pokemon.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (checkResponse.ok) {
+        const checkResult = await checkResponse.json();
+        if (checkResult.isFavorited && checkResult.userId && checkResult.userId !== userId) {
+          // Pokémon is already favorited by another user
+          return { 
+            isFavorited: false, 
+            error: `Este Pokémon já foi favoritado por outro usuário.`
+          };
+        }
+      }
+    } catch (error) {
+      console.warn('Error checking global favorite status, continuing with toggle:', error);
     }
     try {
       const requestBody = {
@@ -418,7 +458,10 @@ export const mongoFavoriteService = {
       }
       
       const result: FavoriteResponse = await response.json();
-      return { isFavorited: result.isFavorited };
+      return { 
+        isFavorited: result.isFavorited,
+        error: result.message
+      };
       
     } catch (error) {
       console.error('Failed to toggle favorite:', error);
