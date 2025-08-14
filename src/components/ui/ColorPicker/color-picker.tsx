@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { HexColorPicker, RgbaColor } from 'react-colorful';
-import { cn } from '../../lib/utils';
+import { HexColorPicker } from 'react-colorful';
+import { cn } from '@/lib/utils';
 
 export interface ColorPickerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   color?: string;
