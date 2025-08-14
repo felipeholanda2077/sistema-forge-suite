@@ -95,6 +95,23 @@ const Index = () => {
                     Implemented
                   </Badge>
                 </div>
+
+                <div className="p-4 bg-muted rounded-lg space-y-2">
+                  <div className="flex items-center gap-2">
+                    <GitBranch className="w-5 h-5 text-primary" />
+                    <span className="font-semibold">🔗 Back-end</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Back-end hospedado na Heroku de forma dinâmica e eficaz para o projeto
+                  </p>
+                  <Badge variant="outline" className="text-xs">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Implemented
+                  </Badge>
+                </div>
+
+
+
               </div>
             </CardContent>
           </Card>
