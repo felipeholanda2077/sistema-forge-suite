@@ -208,8 +208,33 @@ export const favoriteService = {
     }
   },
 
-  async toggleFavorite(pokemon: Pokemon): Promise<{ isFavorited: boolean }> {
+  async toggleFavorite(pokemon: Pokemon): Promise<{ isFavorited: boolean; error?: string }> {
     console.log('toggleFavorite - Starting to toggle favorite for pokemon:', pokemon.id);
+    
+    // First, check if the Pokémon is already favorited by any user
+    try {
+      const checkResponse = await fetch(`${API_BASE_URL}/favorites/check-global/${pokemon.id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${getAuthToken()}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+
+      if (checkResponse.ok) {
+        const checkResult = await checkResponse.json();
+        if (checkResult.isFavorited && checkResult.userId) {
+          // Pokémon is already favorited by another user
+          return { 
+            isFavorited: false, 
+            error: `Este Pokémon já foi favoritado por outro usuário.`
+          };
+        }
+      }
+    } catch (error) {
+      console.warn('Error checking global favorite status, continuing with toggle:', error);
+    }
     
     // Prepare the request data
     const requestData = {
