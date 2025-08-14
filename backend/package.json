@@ -29,7 +29,7 @@
     "vercel": "^44.7.3"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": "18.x"
   },
   "jest": {
     "transform": {},

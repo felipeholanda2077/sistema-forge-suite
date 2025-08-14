@@ -6,7 +6,7 @@ dotenv.config();
 const connectDB = async () => {
   try {
     // MongoDB Atlas connection string with provided credentials
-    const connectionString = process.env.MONGODB_URI ;
+    const connectionString = process.env.MONGODB_URI;
     
     await mongoose.connect(connectionString, {
       useNewUrlParser: true,
