@@ -41,6 +41,7 @@ const PokemonMicrofrontend: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
   const [isLoadingFavorites, setIsLoadingFavorites] = useState(true);
+  const [activeTab, setActiveTab] = useState('search');
 
   // Carrega os favoritos quando o componente é montado ou quando o estado de autenticação muda
   useEffect(() => {
@@ -348,19 +349,21 @@ const PokemonMicrofrontend: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Estatísticas do Cache */}
-      
-      <Tabs defaultValue="search" className="w-full animate-fade-in">
+      <Tabs 
+        value={activeTab} 
+        onValueChange={setActiveTab}
+        className="w-full animate-fade-in"
+      >
         <TabsList className="grid w-full grid-cols-3 h-12">
-          <TabsTrigger value="search" className="flex items-center gap-2">
+          <TabsTrigger value="search" className="flex items-center justify-center gap-2">
             <Search className="w-4 h-4" />
             Buscar
           </TabsTrigger>
-          <TabsTrigger value="random" className="flex items-center gap-2">
+          <TabsTrigger value="random" className="flex items-center justify-center gap-2">
             <Shuffle className="w-4 h-4" />
             Pokedex
           </TabsTrigger>
-          <TabsTrigger value="favorites" className="flex items-center gap-2">
+          <TabsTrigger value="favorites" className="flex items-center justify-center gap-2">
             <Star className="w-4 h-4" />
             Favoritos
           </TabsTrigger>
