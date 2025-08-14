@@ -4,6 +4,11 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import connectDB from './config/db.js';
+
+// Debug logging
+console.log('Starting application...');
+console.log('Environment:', process.env.NODE_ENV || 'development');
+console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
 import { registerUser, getUsers, loginUser, forgotPassword, logoutUser } from './controllers/userController.js';
 import { validateUserRegistration } from './middleware/validators/userValidator.js';
 import { validateLogin } from './middleware/validators/authValidator.js';
@@ -19,7 +24,10 @@ const PORT = process.env.PORT || 3002;
 const app = express();
 
 // Connect to MongoDB
-connectDB();
+connectDB().catch(err => {
+  console.error('Failed to connect to MongoDB:', err);
+  process.exit(1);
+});
 
 // CORS configuration
 const allowedOrigins = [
@@ -141,9 +149,16 @@ app.use((err, req, res, next) => {
   res.status(statusCode).json(errorResponse);
 });
 
-// Start server with error handling
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Internal Server Error', message: err.message });
+});
+
+// Start server
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log('Available endpoints:');
   console.log(`- GET  http://localhost:${PORT}/api/health`);
   console.log(`- POST http://localhost:${PORT}/api/users/register`);
