@@ -91,21 +91,74 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('isAuthenticated state updated to true');
   };
 
-  const logout = () => {
-    console.log('AuthProvider - logout - Removing auth data from localStorage');
+  const clearAllCaches = async () => {
+    try {
+      console.log('Clearing all platform caches...');
+      
+      // Clear localStorage
+      localStorage.clear();
+      
+      // Clear sessionStorage
+      sessionStorage.clear();
+      
+      // Clear IndexedDB if it exists
+      if ('indexedDB' in window) {
+        try {
+          const dbs = await window.indexedDB.databases();
+          dbs.forEach(db => {
+            if (db.name) {
+              window.indexedDB.deleteDatabase(db.name);
+            }
+          });
+        } catch (error) {
+          console.error('Error clearing IndexedDB:', error);
+        }
+      }
+      
+      // Clear service worker caches if they exist
+      if ('caches' in window) {
+        try {
+          const cacheKeys = await caches.keys();
+          await Promise.all(cacheKeys.map(key => caches.delete(key)));
+        } catch (error) {
+          console.error('Error clearing service worker caches:', error);
+        }
+      }
+      
+      console.log('All platform caches cleared successfully');
+    } catch (error) {
+      console.error('Error clearing caches:', error);
+    }
+  };
+
+  const logout = async () => {
+    console.log('AuthProvider - logout - Starting logout process');
     
-    // Remove todos os itens relacionados à autenticação
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('userData');
-    
-    // Limpa os dados do usuário no estado global
-    dispatch({ type: 'LOGOUT' });
-    
-    // Atualiza o estado de autenticação
-    setIsAuthenticated(false);
-    
-    console.log('AuthProvider - logout - Logout completed');
+    try {
+      // Clear all caches first
+      await clearAllCaches();
+      
+      // Clear authentication data
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('userData');
+      
+      // Clear user data in global state
+      dispatch({ type: 'LOGOUT' });
+      
+      // Update authentication state
+      setIsAuthenticated(false);
+      
+      console.log('AuthProvider - logout - Logout completed successfully');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Even if there's an error, we still want to proceed with logout
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('userData');
+      dispatch({ type: 'LOGOUT' });
+      setIsAuthenticated(false);
+    }
   };
 
   const value: AuthContextType = {
