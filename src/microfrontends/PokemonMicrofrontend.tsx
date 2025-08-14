@@ -23,7 +23,7 @@ import {
 import { pokemonApi, Pokemon, getPokemonTypeColor } from '@/services/pokemonApi';
 import { useMicrofrontend } from '@/contexts/MicrofrontendContext';
 import { useAuth } from '@/hooks/useAuth';
-import { favoriteService } from '@/services/favoriteService';
+import { favoriteService, ApiError } from '@/services/favoriteService';
 import { apiCache } from '@/lib/cache';
 import { toast as _toast } from '@/hooks/use-toast';
 
@@ -125,11 +125,8 @@ const PokemonMicrofrontend: React.FC = () => {
     const loadFavorites = async () => {
       if (isAuthenticated) {
         try {
-          const token = localStorage.getItem('authToken');
-          if (token) {
-            const favorites = await favoriteService.getFavorites(token);
-            dispatch({ type: 'SET_FAVORITE_POKEMONS', payload: favorites });
-          }
+          const favorites = await favoriteService.getFavorites();
+          dispatch({ type: 'SET_FAVORITE_POKEMONS', payload: favorites });
         } catch (error) {
           console.error('Error loading favorites:', error);
           toast({
@@ -138,6 +135,9 @@ const PokemonMicrofrontend: React.FC = () => {
             variant: 'destructive',
           });
         }
+      } else {
+        // Clear favorites when user logs out
+        dispatch({ type: 'SET_FAVORITE_POKEMONS', payload: [] });
       }
     };
 
@@ -157,20 +157,9 @@ const PokemonMicrofrontend: React.FC = () => {
     if (isTogglingFavorite) return;
     
     setIsTogglingFavorite(true);
-    const token = localStorage.getItem('authToken');
-    
-    if (!token) {
-      toast({
-        title: '❌ Erro de autenticação',
-        description: 'Sessão expirada. Faça login novamente.',
-        variant: 'destructive',
-      });
-      setIsTogglingFavorite(false);
-      return;
-    }
 
     try {
-      const result = await favoriteService.toggleFavorite(token, pokemon);
+      const result = await favoriteService.toggleFavorite(pokemon);
       
       if (result.isFavorited) {
         dispatch({ type: 'ADD_FAVORITE_POKEMON', payload: pokemon });
@@ -187,11 +176,24 @@ const PokemonMicrofrontend: React.FC = () => {
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);
-      toast({
-        title: '❌ Erro',
-        description: 'Não foi possível atualizar seus favoritos. Tente novamente.',
-        variant: 'destructive',
-      });
+      
+      if (error instanceof ApiError && error.response?.status === 401) {
+        // Handle unauthorized error (token expired or invalid)
+        toast({
+          title: '🔒 Sessão expirada',
+          description: 'Sua sessão expirou. Faça login novamente.',
+          variant: 'destructive',
+        });
+        // Clear auth state and redirect to login
+        localStorage.removeItem('authToken');
+        window.location.href = '/login';
+      } else {
+        toast({
+          title: '❌ Erro',
+          description: 'Não foi possível atualizar seus favoritos. Tente novamente.',
+          variant: 'destructive',
+        });
+      }
     } finally {
       setIsTogglingFavorite(false);
     }
