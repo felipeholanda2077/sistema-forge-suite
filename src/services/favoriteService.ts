@@ -1,16 +1,23 @@
 import { Pokemon } from './pokemonApi';
+import { authService } from './authService';
 
-const API_BASE_URL = 'https://back-end-projetokirvano-b30617960bd0.herokuapp.com/api';
+// Use environment variable if available, otherwise fall back to localhost
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
 
 interface ApiErrorResponse {
-  message?: string;
-  error?: {
+  data: {
+    error?: {
+      code: string;
+      message: string;
+    };
     message?: string;
-    code?: string;
   };
+  status: number;
+  statusText: string;
+  [key: string]: any; // Allow additional properties
 }
 
-class ApiError extends Error {
+export class ApiError extends Error {
   response?: ApiErrorResponse;
 
   constructor(message: string, response?: ApiErrorResponse) {
@@ -20,95 +27,168 @@ class ApiError extends Error {
   }
 }
 
+// Helper function to get auth token
+const getAuthToken = (): string | null => {
+  return localStorage.getItem('authToken');
+};
+
+// Helper function to handle API requests with token
+const fetchWithAuth = async (url: string, options: RequestInit = {}, token?: string): Promise<Response> => {
+  try {
+    // Get token from parameter or storage
+    const authToken = token || getAuthToken();
+    
+    if (!authToken) {
+      const errorResponse: ApiErrorResponse = {
+        data: { error: { code: 'MISSING_TOKEN', message: 'Authentication token is missing' } },
+        status: 401,
+        statusText: 'Unauthorized'
+      };
+      throw new ApiError('No authentication token available', errorResponse);
+    }
+
+    const headers = {
+      'Authorization': `Bearer ${authToken}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      ...options.headers,
+    };
+
+    const response = await fetch(url, { 
+      ...options, 
+      headers,
+      credentials: 'include' // Important for cookies if using httpOnly
+    });
+    
+    const data = await response.json().catch(() => ({}));
+
+    // Handle token expiration or invalidation
+    if (response.status === 401) {
+      if (data.error?.code === 'INVALID_TOKEN' || data.error?.code === 'TOKEN_EXPIRED') {
+        // Clear tokens and redirect to login
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/login';
+        throw new ApiError('Sessão expirada. Por favor, faça login novamente.', data);
+      }
+      throw new ApiError(data.error?.message || 'Não autorizado', data);
+    }
+
+    if (!response.ok) {
+      throw new ApiError(data.message || 'Erro na requisição', data);
+    }
+
+    return response;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiError('Erro de conexão. Por favor, tente novamente.');
+  }
+};
+
 export const favoriteService = {
-  async getFavorites(token: string): Promise<Pokemon[]> {
+  async getFavorites(token?: string): Promise<Pokemon[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/favorites`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new ApiError(
-          responseData.message || 'Failed to fetch favorites',
-          responseData
-        );
+      if (!token) {
+        console.warn('No authentication token provided');
+        return [];
       }
 
-      return responseData.data || [];
+      const response = await fetchWithAuth(
+        `${API_BASE_URL}/favorites`,
+        { 
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+          },
+        },
+        token
+      );
+      
+      const { data, success } = await response.json();
+      if (!success) {
+        throw new Error('Failed to fetch favorites');
+      }
+      return Array.isArray(data) ? data : [];
     } catch (error) {
       console.error('Error fetching favorites:', error);
-      throw error;
+      // Return empty array for any error
+      return [];
     }
   },
 
-  async toggleFavorite(token: string, pokemon: Pokemon): Promise<{ isFavorited: boolean }> {
+  async toggleFavorite(pokemon: Pokemon, token?: string): Promise<{ isFavorited: boolean }> {
     try {
-      const essentialData = {
-        id: pokemon.id,
-        name: pokemon.name,
-        sprites: {
-          front_default: pokemon.sprites?.front_default || '',
-          other: {
-            'official-artwork': {
-              front_default: pokemon.sprites?.other?.['official-artwork']?.front_default || ''
+      if (!token) {
+        console.warn('No authentication token provided');
+        return { isFavorited: false };
+      }
+
+      const response = await fetchWithAuth(
+        `${API_BASE_URL}/favorites/toggle`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify({ 
+            pokemonData: {
+              id: pokemon.id,
+              name: pokemon.name,
+              sprites: {
+                front_default: pokemon.sprites?.front_default || '',
+                other: {
+                  'official-artwork': {
+                    front_default: pokemon.sprites?.other?.['official-artwork']?.front_default || ''
+                  }
+                }
+              },
+              types: Array.isArray(pokemon.types) ? pokemon.types : []
             }
-          }
+          }),
         },
-        types: pokemon.types || []
-      };
+        token
+      );
 
-      const response = await fetch(`${API_BASE_URL}/favorites/toggle`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ pokemonData: essentialData })
-      });
-
-      if (!response.ok) {
+      const { data, success } = await response.json();
+      if (!success) {
         throw new Error('Failed to toggle favorite');
       }
-
-      const responseData = await response.json();
-      return responseData.data || { isFavorited: false };
+      return data || { isFavorited: false };
     } catch (error) {
       console.error('Error toggling favorite:', error);
-      throw error;
+      return { isFavorited: false };
     }
   },
 
-  async isPokemonFavorited(token: string, pokemonId: number): Promise<{ isFavorited: boolean }> {
+  async isPokemonFavorited(pokemonId: number, token?: string): Promise<{ isFavorited: boolean }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/favorites/check/${pokemonId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        // If not found, return not favorited instead of throwing
-        if (response.status === 404) {
-          return { isFavorited: false };
-        }
-        throw new ApiError(
-          responseData.message || 'Failed to check favorite status',
-          responseData
-        );
+      if (!token) {
+        console.warn('No authentication token provided');
+        return { isFavorited: false };
       }
 
-      return responseData.data || { isFavorited: false };
+      const response = await fetchWithAuth(
+        `${API_BASE_URL}/favorites/check/${pokemonId}`,
+        { 
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+          },
+        },
+        token
+      );
+
+      const { data, success } = await response.json();
+      if (!success) {
+        return { isFavorited: false };
+      }
+      return data || { isFavorited: false };
     } catch (error) {
-      console.error('Error checking favorite status:', error);
-      // Return not favorited as fallback
+      // For any error, assume not favorited
       return { isFavorited: false };
     }
   },
