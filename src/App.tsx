@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import { AuthProvider } from "./contexts/AuthContext";
 import { useAuth } from "./hooks/useAuth";
 import { MicrofrontendProvider } from "./contexts/MicrofrontendContext";
+import ContactWidget from "./components/ui/ContactWidget/ContactWidget";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ContactWidget />
             <Routes>
               <Route path="/" element={
                 <PrivateRoute>

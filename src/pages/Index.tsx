@@ -99,12 +99,12 @@ const Index = () => {
             </CardContent>
           </Card>
 
-            {/* Layout dos Microfrontends */}
+          {/* Layout dos Microfrontends */}
             <div className=" grid-cols-2 lg:grid-cols-3 gap-8">
-              {/* Microfrontend de Autenticação - Coluna Esquerda */}
-              
+            {/* Microfrontend de Autenticação - Coluna Esquerda */}
+            
 
-              {/* Microfrontend da API Pokémon - Colunas Direitas */}
+            {/* Microfrontend da API Pokémon - Colunas Direitas */}
               <div className="lg:col-span-2">
                 <div className="mb-4">
                   <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
