@@ -7,13 +7,16 @@ const connectDB = async () => {
   try {
     console.log('Attempting to connect to MongoDB...');
     
-    const connectionString = "mongodb+srv://felipeholandafreitas:cWP78Nnt3b1tMb96@projeto-kirvano.qtilluf.mongodb.net/Projeto-Kirvano?retryWrites=true&w=majority";
+    // Get MongoDB URI from environment variable or use the hardcoded one as fallback
+    const connectionString = process.env.MONGODB_URI || "mongodb+srv://felipeholandafreitas:cWP78Nnt3b1tMb96@projeto-kirvano.qtilluf.mongodb.net/Projeto-Kirvano?retryWrites=true&w=majority";
     
     if (!connectionString) {
-      throw new Error('MONGODB_URI is not defined in environment variables');
+      throw new Error('MongoDB connection string is not defined');
     }
     
-    console.log('Connecting to MongoDB with URI:', connectionString.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@'));
+    // Log a masked version of the connection string for security
+    const maskedConnectionString = connectionString.replace(/(mongodb\+srv:\/\/)([^:]+):([^@]+)@/, '$1***:***@');
+    console.log('Connecting to MongoDB with URI:', maskedConnectionString);
     
     const connection = await mongoose.connect(connectionString, {
       useNewUrlParser: true,

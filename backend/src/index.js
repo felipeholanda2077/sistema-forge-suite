@@ -19,8 +19,6 @@ import userFavoriteRoutes from './routes/userFavoriteRoutes.js';
 dotenv.config();
 
 // Create Express app
-const PORT = process.env.PORT || 3002;
-
 const app = express();
 
 // Connect to MongoDB
@@ -28,6 +26,9 @@ connectDB().catch(err => {
   console.error('Failed to connect to MongoDB:', err);
   process.exit(1);
 });
+
+// Get port from environment and store in Express.
+const PORT = process.env.PORT || 3002;
 
 // CORS configuration
 const allowedOrigins = [
@@ -152,7 +153,28 @@ app.use((err, req, res, next) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
-  res.status(500).json({ error: 'Internal Server Error', message: err.message });
+  
+  // Log detailed error information
+  console.error('Error details:', {
+    message: err.message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+    path: req.path,
+    method: req.method,
+    body: req.body,
+    params: req.params,
+    query: req.query,
+    headers: req.headers
+  });
+  
+  // Send appropriate response
+  const statusCode = err.statusCode || 500;
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  res.status(statusCode).json({
+    error: isProduction ? 'Internal Server Error' : err.message,
+    message: isProduction ? 'An unexpected error occurred' : err.message,
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
+  });
 });
 
 // Start server
@@ -163,6 +185,15 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`- GET  http://localhost:${PORT}/api/health`);
   console.log(`- POST http://localhost:${PORT}/api/users/register`);
   console.log(`- GET  http://localhost:${PORT}/api/users`);
+}).on('error', (err) => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Rejection:', err);
+  server.close(() => process.exit(1));
 });
 
 // Handle server errors
