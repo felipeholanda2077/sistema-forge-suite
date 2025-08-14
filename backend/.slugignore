@@ -1,7 +1,13 @@
-../src/
-!src/
-!node_modules/
-!package.json
-!package-lock.json
-!Procfile
-!.env*
+# Ignorar tudo, exceto o diretório backend
+/*
+
+# Incluir a pasta backend
+!/backend/
+
+# Incluir arquivos necessários do backend
+/backend/*
+!/backend/src/**
+!/backend/package.json
+!/backend/package-lock.json
+!/backend/Procfile
+!/backend/.env*
