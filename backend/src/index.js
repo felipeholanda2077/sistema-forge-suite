@@ -15,9 +15,7 @@ dotenv.config();
 // Create Express app
 const PORT = process.env.PORT || 3002;
 
-// api/index.js
-const app = require('../backend/src/index');
-module.exports = app;
+const app = express();
 
 // Connect to MongoDB
 connectDB();
