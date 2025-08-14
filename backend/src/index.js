@@ -29,6 +29,9 @@ connectDB().catch(err => {
 
 // Get port from environment and store in Express.
 const PORT = process.env.PORT || 3002;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
 
 // CORS configuration
 const allowedOrigins = [
@@ -153,7 +156,7 @@ app.use((err, req, res, next) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
-  
+
   // Log detailed error information
   console.error('Error details:', {
     message: err.message,
@@ -165,11 +168,11 @@ app.use((err, req, res, next) => {
     query: req.query,
     headers: req.headers
   });
-  
+
   // Send appropriate response
   const statusCode = err.statusCode || 500;
   const isProduction = process.env.NODE_ENV === 'production';
-  
+
   res.status(statusCode).json({
     error: isProduction ? 'Internal Server Error' : err.message,
     message: isProduction ? 'An unexpected error occurred' : err.message,
