@@ -3,7 +3,7 @@ import { pokemonApi } from './pokemonApi';
 import { toast } from '@/components/ui/use-toast';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://back-end-projetokirvano-b30617960bd0.herokuapp.com/api';
 
 interface ApiResponse<T> {
   success: boolean;
