@@ -7,7 +7,7 @@ const connectDB = async () => {
   try {
     console.log('Attempting to connect to MongoDB...');
     
-    const connectionString = process.env.MONGODB_URI;
+    const connectionString = "mongodb+srv://felipeholandafreitas:cWP78Nnt3b1tMb96@projeto-kirvano.qtilluf.mongodb.net/Projeto-Kirvano?retryWrites=true&w=majority";
     
     if (!connectionString) {
       throw new Error('MONGODB_URI is not defined in environment variables');

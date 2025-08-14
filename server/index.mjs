@@ -33,7 +33,7 @@ const connectDB = async () => {
 
     // Ensure we're connecting to the kirvano database
     const mongoUri = process.env.MONGODB_URI.endsWith('?') 
-      ? `${process.env.MONGODB_URI}appName=arcane-forge-suite`
+      ? `mongodb+srv://felipeholandafreitas:cWP78Nnt3b1tMb96@projeto-kirvano.qtilluf.mongodb.net/Projeto-Kirvano?retryWrites=true&w=majority`
       : process.env.MONGODB_URI;
 
     await mongoose.connect(mongoUri, {
