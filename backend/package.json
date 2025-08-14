@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node --experimental-specifier-resolution=node src/index.js",
     "dev": "nodemon --experimental-specifier-resolution=node src/index.js",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "heroku-prebuild": "echo \"Starting Heroku build process\"",
+    "heroku-postbuild": "echo \"Build process complete\""
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
