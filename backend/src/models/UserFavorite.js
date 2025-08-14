@@ -38,13 +38,27 @@ const userFavoriteSchema = new mongoose.Schema({
   timestamps: true,
   // Create a compound index to ensure a user can't favorite the same Pokémon twice
   indexes: [
+    // Compound index for userId and pokemonId with uniqueness constraint
     {
       userId: 1,
       pokemonId: 1
     },
+    // Alternative syntax for the same compound index
     {
       unique: true,
       fields: ['userId', 'pokemonId']
+    },
+    // Index for faster lookups by userId alone
+    {
+      userId: 1
+    },
+    // Index for faster lookups by pokemonId alone
+    {
+      pokemonId: 1
+    },
+    // Index for sorting by addedAt
+    {
+      addedAt: -1
     }
   ]
 });
