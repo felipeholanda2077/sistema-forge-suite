@@ -5,11 +5,9 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "start": "npm start",
-    "dev": "nodemon src/index.js",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "heroku-prebuild": "echo \"Starting Heroku build process\"",
-    "heroku-postbuild": "echo \"Build process complete\""
+    "start": "node src/index.js",
+    "dev": "nodemon --experimental-specifier-resolution=node src/index.js",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -31,7 +29,7 @@
     "vercel": "^44.7.3"
   },
   "engines": {
-    "node": "18.x"
+    "node": ">=16.0.0"
   },
   "jest": {
     "transform": {},
