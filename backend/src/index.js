@@ -4,9 +4,10 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import connectDB from './config/db.js';
-import { registerUser, getUsers, loginUser, forgotPassword } from './controllers/userController.js';
+import { registerUser, getUsers, loginUser, forgotPassword, logoutUser } from './controllers/userController.js';
 import { validateUserRegistration } from './middleware/validators/userValidator.js';
 import { validateLogin } from './middleware/validators/authValidator.js';
+import { authenticateToken } from './middleware/auth.js';
 import userFavoriteRoutes from './routes/userFavoriteRoutes.js';
 
 // Load environment variables
@@ -27,31 +28,44 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:8080',
   'https://arcane-forge-suite.vercel.app',
+  'https://back-end-projetokirvano-b30617960bd0.herokuapp.com',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
+// Handle preflight requests first
+app.options('*', cors({
+  origin: true,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+}));
+
+// Then apply CORS for all other requests
 const corsOptions = {
   origin: function (origin, callback) {
-    // Em produção, permita apenas origens específicas
-    if (process.env.NODE_ENV === 'production') {
-      return callback(null, allowedOrigins);
+    // In development, allow all origins
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
     }
-    
-    // Em desenvolvimento, permita todas as origens para facilitar o desenvolvimento
-    callback(null, true);
+    // In production, only allow whitelisted origins
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'x-access-token'],
   exposedHeaders: ['Content-Range', 'X-Total-Count'],
   credentials: true,
-  preflightContinue: false,
-  optionsSuccessStatus: 204
+  optionsSuccessStatus: 200
 };
 
-// Middleware
-app.use(helmet());
+// Apply CORS middleware
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
+app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -77,14 +91,25 @@ router.get('/health', (req, res) => {
 // User routes
 router.post('/users/register', validateUserRegistration, registerUser);
 router.post('/users/login', validateLogin, loginUser);
+router.post('/users/logout', authenticateToken, logoutUser);
 router.post('/users/forgot-password', forgotPassword);
 router.get('/users', getUsers);
 
-// User favorites routes
-router.use('/favorites', userFavoriteRoutes);
+// Mount favorites routes directly on the app to bypass authentication middleware
+app.use('/api/favorites', userFavoriteRoutes);
 
 // Mount API routes
 app.use('/api', router);
+
+// Apply authentication middleware to all routes except favorites
+app.use((req, res, next) => {
+  // Skip authentication for favorites routes
+  if (req.path.startsWith('/api/favorites')) {
+    return next();
+  }
+  // Apply authentication to all other routes
+  authenticateToken(req, res, next);
+});
 
 // 404 handler for API routes
 app.use('/api/*', (req, res) => {

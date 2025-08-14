@@ -46,8 +46,8 @@ export const registerUser = async (req, res, next) => {
     // Generate JWT token
     const token = jwt.sign(
       { userId: user._id, email: user.email },
-      process.env.JWT_SECRET || 'your_jwt_secret',
-      { expiresIn: '24h' }
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '30d' }
     );
 
     // Remove password from response
@@ -73,7 +73,7 @@ export const loginUser = async (req, res, next) => {
 
     // Find user by email
     const user = await User.findOne({ email }).select('+password');
-    
+
     // Check if user exists
     if (!user) {
       return res.status(401).json({
@@ -96,14 +96,7 @@ export const loginUser = async (req, res, next) => {
         }
       });
     }
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: user._id, email: user.email },
-      process.env.JWT_SECRET || 'your_jwt_secret',
-      { expiresIn: '24h' }
-    );
-
+    
     // Remove password from response
     const userResponse = user.toObject();
     delete userResponse.password;
@@ -134,13 +127,43 @@ export const getUsers = async (req, res, next) => {
   }
 };
 
+export const logoutUser = async (req, res, next) => {
+  try {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+      return res.status(200).json({
+        success: true,
+        message: 'Logout successful'
+      });
+    }
+
+    // Get user from request (added by authenticateToken middleware)
+    if (req.user && req.user.id !== 'anonymous') {
+      const user = await User.findById(req.user.id);
+      if (user) {
+        await user.invalidateToken(token);
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Logout successful'
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
+    next(error);
+  }
+};
+
 export const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
 
     // Find user by email
     const user = await User.findOne({ email });
-    
+
     if (!user) {
       return res.status(200).json({
         success: true,
@@ -154,7 +177,7 @@ export const forgotPassword = async (req, res, next) => {
 
     // Create reset URL
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-    
+
     // In a real application, you would send an email here
     console.log('Password reset URL:', resetUrl);
 
@@ -174,12 +197,12 @@ export const forgotPassword = async (req, res, next) => {
     }
   } catch (error) {
     console.error('Forgot password error:', error);
-    
+
     // Reset token and expiry in case of error
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
     await user.save({ validateBeforeSave: false });
-    
+
     next(error);
   }
 };

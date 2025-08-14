@@ -1,6 +1,7 @@
 import type { Pokemon } from './pokemonApi';
 import { pokemonApi } from './pokemonApi';
 import { toast } from '@/components/ui/use-toast';
+import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
 
@@ -48,70 +49,200 @@ export class ApiError extends Error {
   }
 }
 
+interface TokenPayload {
+  userId: string;
+  email: string;
+  exp: number;
+  iat: number;
+}
+
+const TOKEN_REFRESH_THRESHOLD = 300; // 5 minutos antes de expirar
+
+const parseJwt = (token: string): TokenPayload | null => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Error parsing JWT:', error);
+    return null;
+  }
+};
+
+const isTokenExpired = (token: string): boolean => {
+  const payload = parseJwt(token);
+  if (!payload) return true;
+  
+  // Verifica se o token expirou ou está perto de expirar
+  const now = Date.now() / 1000;
+  return payload.exp < now - TOKEN_REFRESH_THRESHOLD;
+};
+
 const getAuthToken = (): string | null => {
-  return localStorage.getItem('authToken');
+  const token = localStorage.getItem('authToken');
+  if (!token) return null;
+  
+  // Se o token estiver válido, retorna ele
+  if (!isTokenExpired(token)) {
+    return token;
+  }
+  
+  // Se o token estiver expirado, tenta renovar
+  return refreshToken();
+};
+
+const refreshToken = (): string | null => {
+  // Tenta renovar o token usando o refresh token se disponível
+  const refreshToken = localStorage.getItem('refreshToken');
+  if (!refreshToken) {
+    // Se não tiver refresh token, limpa os tokens e redireciona para o login
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
+    window.location.href = '/login';
+    return null;
+  }
+  
+  // Aqui você implementaria a lógica para renovar o token
+  // Por enquanto, vamos apenas retornar null para forçar o login
+  console.warn('Token expirado. Por favor, faça login novamente.');
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('refreshToken');
+  window.location.href = '/login';
+  return null;
 };
 
 const getUserIdFromToken = (): string => {
   const token = getAuthToken();
-  if (!token) return '';
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.userId || '';
-  } catch (error) {
-    console.error('Error decoding token:', error);
-    return '';
-  }
+  if (!token) return 'anonymous';
+  
+  const payload = parseJwt(token);
+  return payload?.userId?.toString() || 'anonymous';
 };
 
 const fetchWithAuth = async (url: string, options: RequestInit = {}): Promise<Response> => {
   const authToken = getAuthToken();
   const userId = getUserIdFromToken();
 
-  if (!authToken) {
-    throw new ApiError('Authentication token is missing', new Response(
-      JSON.stringify({ error: 'Authentication token is missing' }),
-      {
-        status: 401,
-        statusText: 'Unauthorized',
-        headers: { 'Content-Type': 'application/json' }
-      }
-    ));
-  }
-
+  // Configuração dos headers
   const headers = new Headers(options.headers);
-  headers.set('Authorization', `Bearer ${authToken}`);
+  
+  // Adiciona o token de autorização se existir
+  if (authToken) {
+    headers.set('Authorization', `Bearer ${authToken}`);
+  }
+  
+  // Headers padrão
   headers.set('Content-Type', 'application/json');
   headers.set('Accept', 'application/json');
+
+  // Create URL object to handle query parameters properly
+  const urlObj = new URL(url, window.location.origin);
   
-  // Only add userId to the URL if it's not already in the path
-  let finalUrl = url;
-  if (userId && !url.includes('/user/')) {
-    const separator = url.includes('?') ? '&' : '?';
-    finalUrl = `${url}${separator}userId=${encodeURIComponent(userId)}`;
+  // Add userId to query parameters if not already present
+  if (userId && !urlObj.searchParams.has('userId')) {
+    urlObj.searchParams.set('userId', userId);
+  } else if (!urlObj.searchParams.has('userId')) {
+    urlObj.searchParams.set('userId', 'anonymous');
   }
 
-  const response = await fetch(finalUrl, { 
-    ...options,
-    headers,
-    credentials: 'include',
-  });
+  const finalUrl = urlObj.toString();
+  console.log('Fetching URL:', finalUrl);
   
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    
-    if (response.status === 401) {
-      localStorage.removeItem('authToken');
-      window.location.href = '/login';
+  try {
+    const fetchOptions: RequestInit = {
+      ...options,
+      headers,
+      // Use 'include' for credentials to ensure cookies are sent with CORS
+      credentials: 'include',
+      mode: 'cors',
+      cache: 'no-cache'
+    };
+
+    console.log('Fetch options:', {
+      method: fetchOptions.method || 'GET',
+      headers: Object.fromEntries(headers.entries()),
+      credentials: fetchOptions.credentials
+    });
+
+    try {
+      // Convert Headers to a plain object
+      const headers: Record<string, string> = {};
+      if (fetchOptions.headers) {
+        if (fetchOptions.headers instanceof Headers) {
+          // Handle Headers object
+          fetchOptions.headers.forEach((value, key) => {
+            headers[key] = value;
+          });
+        } else if (Array.isArray(fetchOptions.headers)) {
+          // Handle array of [key, value] tuples
+          fetchOptions.headers.forEach(([key, value]) => {
+            headers[key] = value;
+          });
+        } else if (typeof fetchOptions.headers === 'object') {
+          // Handle plain object
+          Object.entries(fetchOptions.headers).forEach(([key, value]) => {
+            headers[key] = String(value);
+          });
+        }
+      }
+
+      const response = await axios({
+        url: finalUrl,
+        method: (fetchOptions.method as string) || 'GET',
+        headers,
+        data: fetchOptions.body,
+        withCredentials: true,
+        responseType: 'json'
+      });
+      
+      console.log('Response status:', response.status, response.statusText);
+      
+      // Convert Axios response to Fetch-like response
+      return {
+        ok: response.status >= 200 && response.status < 300,
+        status: response.status,
+        statusText: response.statusText,
+        json: async () => response.data,
+        text: async () => JSON.stringify(response.data),
+        headers: new Headers(response.headers as Record<string, string>),
+        url: finalUrl
+      } as unknown as Response;
+    } catch (error) {
+      if (error.response) {
+        const { status, data } = error.response;
+        console.error('API Error:', data);
+        
+        if (status === 401) {
+          console.log('Authentication failed, redirecting to login');
+          localStorage.removeItem('authToken');
+          window.location.href = '/login';
+        }
+        
+        throw new ApiError(
+          data?.message || `Request failed with status ${status}`,
+          error.response,
+          data
+        );
+      }
+      
+      throw error;
     }
-    
+  } catch (error) {
+    console.error('Fetch error:', error);
+    if (error instanceof ApiError) {
+      throw error;
+    }
     throw new ApiError(
-      errorData.message || 'Request failed',
-      response
+      error instanceof Error ? error.message : 'Network request failed',
+      new Response(null, { status: 0 })
     );
   }
-
-  return response;
 };
 
 interface PokemonType {
@@ -254,12 +385,11 @@ const mapPokemonData = (data: PokemonData): Pokemon => {
 };
 
 export const mongoFavoriteService = {
-  // Get user-specific favorites
+  // Get user-specific favorites (supports anonymous users)
   async getFavoritesForUser(userId: string): Promise<Pokemon[]> {
-    // Reject empty or 'anonymous' user IDs
-    if (!userId || userId === 'anonymous') {
-      console.error('Invalid or missing user ID provided to getFavoritesForUser:', userId);
-      throw new Error('ID de usuário inválido ou não autenticado');
+    // If no user ID is provided, default to 'anonymous'
+    if (!userId) {
+      userId = 'anonymous';
     }
 
     console.log(`[getFavoritesForUser] Fetching favorites for user: ${userId}`);
@@ -351,69 +481,48 @@ export const mongoFavoriteService = {
         
     } catch (error) {
       console.error('[getFavoritesForUser] Failed to fetch user favorites:', error);
-      if (error instanceof ApiError && error.status === 401) {
-        console.log('[getFavoritesForUser] Unauthorized, redirecting to login');
-        window.location.href = '/login';
+      if (error instanceof ApiError) {
+        if (error.status === 401 && userId !== 'anonymous') {
+          console.log('[getFavoritesForUser] Unauthorized, redirecting to login');
+          window.location.href = '/login';
+        } else if (error.status === 404) {
+          console.log('[getFavoritesForUser] No favorites found for user:', userId);
+        }
       }
       return [];
     }
   },
   
-  // Get favorites for the current user
+  // Get favorites for the current user (supports anonymous users)
   async getFavorites(): Promise<Pokemon[]> {
-    const userId = getUserIdFromToken();
-    
-    // If no user ID or it's 'anonymous', return empty array
-    if (!userId || userId === 'anonymous') {
-      console.log('[getFavorites] No valid user ID, returning empty favorites');
-      return [];
-    }
+    // Get user ID from token or use 'anonymous' if not authenticated
+    const userId = getUserIdFromToken() || 'anonymous';
     
     try {
       return await this.getFavoritesForUser(userId);
     } catch (error) {
       console.error('[getFavorites] Error fetching favorites:', error);
+      // Don't redirect to login for anonymous users
+      if (error instanceof ApiError && error.status === 401 && userId !== 'anonymous') {
+        window.location.href = '/login';
+      }
       return [];
     }
   },
 
   async toggleFavorite(pokemon: Pokemon): Promise<{ isFavorited: boolean; error?: string }> {
-    const userId = getUserIdFromToken();
-    
-    // Ensure we have a valid user ID and it's not 'anonymous'
-    if (!userId || userId === 'anonymous') {
-      console.error('Invalid or missing user ID in token');
-      throw new Error('Você precisa estar autenticado para favoritar um Pokémon');
-    }
+    // Get user ID from token or use 'anonymous' if not authenticated
+    const userId = getUserIdFromToken() || 'anonymous';
     
     console.log(`[toggleFavorite] Toggling favorite for user: ${userId}, Pokémon: ${pokemon.id}`);
 
-    // First, check if the Pokémon is already favorited by any user
     try {
-      const checkResponse = await fetchWithAuth(`${API_BASE_URL}/favorites/check-global/${pokemon.id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      // Prepare the request URL with userId as a query parameter
+      const url = new URL(`${API_BASE_URL}/favorites/toggle`);
+      url.searchParams.append('userId', userId);
 
-      if (checkResponse.ok) {
-        const checkResult = await checkResponse.json();
-        if (checkResult.isFavorited && checkResult.userId && checkResult.userId !== userId) {
-          // Pokémon is already favorited by another user
-          return { 
-            isFavorited: false, 
-            error: `Este Pokémon já foi favoritado por outro usuário.`
-          };
-        }
-      }
-    } catch (error) {
-      console.warn('Error checking global favorite status, continuing with toggle:', error);
-    }
-    try {
+      // Prepare the request body with the pokemon data
       const requestBody = {
-        userId,
-        pokemonId: pokemon.id,
         pokemon: {
           id: pokemon.id,
           name: pokemon.name,
@@ -474,8 +583,9 @@ export const mongoFavoriteService = {
   },
 
   async isPokemonFavorited(pokemonId: number): Promise<boolean> {
-    const userId = getUserIdFromToken();
-    if (!userId) return false;
+    // Get user ID from token or use 'anonymous' if not authenticated
+    const userId = getUserIdFromToken() || 'anonymous';
+    
     try {
       const response = await fetchWithAuth(`${API_BASE_URL}/favorites/check/${pokemonId}?userId=${userId}`);
       
@@ -493,10 +603,11 @@ export const mongoFavoriteService = {
       }
       
       const result: FavoriteResponse = await response.json();
-      return result.isFavorited;
+      return result.isFavorited || false;
     } catch (error) {
       console.error('Failed to check if Pokemon is favorited:', error);
-      if (error instanceof ApiError && error.status === 401) {
+      // Don't redirect to login for anonymous users
+      if (error instanceof ApiError && error.status === 401 && userId !== 'anonymous') {
         window.location.href = '/login';
       }
       return false;

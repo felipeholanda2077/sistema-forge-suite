@@ -135,7 +135,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('AuthProvider - logout - Starting logout process');
     
     try {
-      // Clear all caches first
+      // Call the authService to invalidate the token on the server
+      const { authService } = await import('@/services/authService');
+      await authService.logout();
+      
+      // Clear all caches
       await clearAllCaches();
       
       // Clear authentication data

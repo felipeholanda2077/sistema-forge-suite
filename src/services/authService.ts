@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://back-end-projetokirvano-b30617960bd0.herokuapp.com/api';
+const API_BASE_URL = 'http://localhost:3002/api';
 
 interface ApiErrorResponse {
   data: {
@@ -266,4 +266,48 @@ export const authService = {
       throw new ApiError('Erro inesperado ao processar a solicitação de recuperação de senha.');
     }
   },
+  
+  async logout(): Promise<{ success: boolean; message: string }> {
+    try {
+      // Get the token from local storage
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`${API_BASE_URL}/users/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
+        credentials: 'include'
+      });
+
+      // Clear local storage
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Logout failed:', errorData);
+        return {
+          success: false,
+          message: errorData.message || 'Falha ao fazer logout. Por favor, tente novamente.'
+        };
+      }
+      
+      return {
+        success: true,
+        message: 'Logout realizado com sucesso.'
+      };
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Even if there's an error, clear local storage
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      
+      return {
+        success: false,
+        message: 'Ocorreu um erro ao tentar fazer logout. Suas credenciais locais foram removidas.'
+      };
+    }
+  }
 };

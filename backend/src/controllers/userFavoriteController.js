@@ -27,8 +27,16 @@ const extractEssentialPokemonData = (pokemon) => ({
 
 export const getUserFavorites = async (req, res, next) => {
   try {
-    // Usar o ID do usuário autenticado ou 'anonymous' se não estiver autenticado
-    const userId = req.user?.id || 'anonymous';
+    // Get userId from query parameters or use the authenticated user's ID or 'anonymous'
+    const userId = req.query.userId || req.user?.id || 'anonymous';
+    
+    // If no userId is provided, return an empty array
+    if (!userId) {
+      return res.status(200).json({
+        success: true,
+        data: []
+      });
+    }
     
     const favorites = await UserFavorite.find({ userId });
     
@@ -47,7 +55,11 @@ export const getUserFavorites = async (req, res, next) => {
     });
   } catch (error) {
     console.error('Erro ao buscar favoritos:', error);
-    next(error);
+    // Return empty array on error to ensure the frontend doesn't break
+    res.status(200).json({
+      success: true,
+      data: []
+    });
   }
 };
 
@@ -63,8 +75,8 @@ export const toggleFavorite = async (req, res, next) => {
 
     const { pokemon } = req.body;
     
-    // Usar o ID do usuário autenticado ou 'anonymous' se não estiver autenticado
-    const userId = req.user?.id || 'anonymous';
+    // Get userId from query parameter or authenticated user or default to 'anonymous'
+    const userId = req.query.userId || req.user?.id || 'anonymous';
 
     if (!pokemon || !pokemon.id) {
       return res.status(400).json({ 
@@ -76,12 +88,24 @@ export const toggleFavorite = async (req, res, next) => {
       });
     }
 
+    // Check if user has reached the maximum number of favorites (200)
+    const favoritesCount = await UserFavorite.countDocuments({ userId });
+    if (favoritesCount >= 200) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'MAX_FAVORITES_REACHED',
+          message: 'Limite máximo de 200 favoritos atingido'
+        }
+      });
+    }
+
     const essentialData = extractEssentialPokemonData(pokemon);
 
-    // Como estamos usando um ID de usuário fixo 'anonymous', não precisamos converter para ObjectId
+    // Check if the Pokémon is already favorited
     let favorite = await UserFavorite.findOne({ 
-      userId: userId,
-      'pokemonData.id': pokemon.id
+      userId,
+      pokemonId: pokemon.id
     });
 
     if (favorite) {
@@ -89,8 +113,12 @@ export const toggleFavorite = async (req, res, next) => {
       await UserFavorite.deleteOne({ _id: favorite._id });
       return res.status(200).json({ 
         success: true, 
-        isFavorite: false,
-        message: 'Pokémon removido dos favoritos com sucesso'
+        isFavorited: false,
+        message: 'Pokémon removido dos favoritos com sucesso',
+        favorite: {
+          ...favorite.toObject(),
+          pokemonData: essentialData
+        }
       });
     } else {
       // Add to favorites with only essential data
@@ -104,7 +132,7 @@ export const toggleFavorite = async (req, res, next) => {
       
       return res.status(200).json({ 
         success: true, 
-        isFavorite: true,
+        isFavorited: true,
         message: 'Pokémon adicionado aos favoritos com sucesso',
         favorite: {
           ...favorite.toObject(),

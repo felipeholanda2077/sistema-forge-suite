@@ -34,28 +34,22 @@ const getAuthToken = (): string | null => {
   return token;
 };
 
-// Helper function to handle API requests with token
+// Helper function to handle API requests with optional token
 const fetchWithAuth = async (url: string, options: RequestInit = {}, token?: string): Promise<Response> => {
   try {
     // Get token from parameter or storage
     const authToken = token || getAuthToken();
     console.log('fetchWithAuth - Using token:', authToken ? 'Token available' : 'No token available');
     
-    if (!authToken) {
-      console.error('fetchWithAuth - No authentication token available');
-      const errorResponse: ApiErrorResponse = {
-        data: { error: { code: 'MISSING_TOKEN', message: 'Authentication token is missing' } },
-        status: 401,
-        statusText: 'Unauthorized'
-      };
-      throw new ApiError('No authentication token available', errorResponse);
-    }
-
-    // Create headers object, ensuring our auth and content type headers are set correctly
+    // Create headers object with content type and accept headers
     const headers = new Headers(options.headers);
-    headers.set('Authorization', `Bearer ${authToken}`);
     headers.set('Content-Type', 'application/json');
     headers.set('Accept', 'application/json');
+    
+    // Only add Authorization header if token is available
+    if (authToken) {
+      headers.set('Authorization', `Bearer ${authToken}`);
+    }
 
     const response = await fetch(url, { 
       ...options,
@@ -66,8 +60,8 @@ const fetchWithAuth = async (url: string, options: RequestInit = {}, token?: str
     
     const data = await response.json().catch(() => ({}));
 
-    // Handle token expiration or invalidation
-    if (response.status === 401) {
+    // Handle token expiration or invalidation only if we were using a token
+    if (authToken && response.status === 401) {
       if (data.error?.code === 'INVALID_TOKEN' || data.error?.code === 'TOKEN_EXPIRED') {
         // Clear tokens and redirect to login
         localStorage.removeItem('authToken');
@@ -92,12 +86,30 @@ const fetchWithAuth = async (url: string, options: RequestInit = {}, token?: str
 export const favoriteService = {
   async getFavorites(token?: string): Promise<Pokemon[]> {
     console.log('🔍 getFavorites - Iniciando busca por favoritos');
-    console.log('📡 Fazendo requisição para:', `${API_BASE_URL}/favorites`);
+    
+    // Get user ID from token if available
+    let userId = '';
+    if (token) {
+      try {
+        const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+        userId = tokenPayload.userId || '';
+      } catch (e) {
+        console.warn('Failed to parse token for userId:', e);
+      }
+    }
+    
+    // Construct URL with userId only if available and not already in URL
+    const url = new URL(`${API_BASE_URL}/favorites`);
+    if (userId && !url.searchParams.has('userId')) {
+      url.searchParams.append('userId', userId);
+    }
+    
+    console.log('📡 Fazendo requisição para:', url.toString());
     
     try {
       // Use fetchWithAuth which will handle the token and headers automatically
       const response = await fetchWithAuth(
-        `${API_BASE_URL}/favorites`,
+        url.toString(),
         { 
           method: 'GET',
           headers: {

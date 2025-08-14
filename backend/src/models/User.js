@@ -37,7 +37,12 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   },
   resetPasswordToken: String,
-  resetPasswordExpire: Date
+  resetPasswordExpire: Date,
+  invalidTokens: [{
+    type: String,
+    select: false
+  }],
+  lastLogin: Date
 }, {
   timestamps: true,
   versionKey: false
@@ -59,6 +64,32 @@ userSchema.pre('save', async function(next) {
 // Method to compare passwords
 userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// Method to invalidate a token
+userSchema.methods.invalidateToken = async function(token) {
+  if (!this.invalidTokens) {
+    this.invalidTokens = [];
+  }
+  
+  if (!this.invalidTokens.includes(token)) {
+    this.invalidTokens.push(token);
+    await this.save();
+  }
+  
+  return this;
+};
+
+// Method to check if a token is invalid
+userSchema.methods.isTokenInvalid = function(token) {
+  if (!this.invalidTokens) return false;
+  return this.invalidTokens.includes(token);
+};
+
+// Method to update last login time
+userSchema.methods.updateLastLogin = async function() {
+  this.lastLogin = new Date();
+  await this.save();
 };
 
 // Generate password reset token

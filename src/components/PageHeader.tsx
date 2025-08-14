@@ -1,12 +1,39 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/Button/button';
 import { useAuth } from '@/hooks/useAuth';
-import { LogOut } from 'lucide-react';
+import { LogOut, Loader2 } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
 
 export function PageHeader() {
   const { logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      await logout();
+      
+      toast({
+        title: 'Logout realizado',
+        description: 'Você saiu da sua conta com sucesso.',
+        variant: 'default',
+      });
+      
+      // Redirect to login page after a short delay
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: 'Erro ao sair',
+        description: 'Ocorreu um erro ao tentar sair da sua conta. Por favor, tente novamente.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -20,10 +47,15 @@ export function PageHeader() {
             variant="ghost" 
             size="sm" 
             onClick={handleLogout}
-            className="text-muted-foreground hover:text-foreground"
+            disabled={isLoggingOut}
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sair
+            {isLoggingOut ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <LogOut className="h-4 w-4 mr-2" />
+            )}
+            {isLoggingOut ? 'Saindo...' : 'Sair'}
           </Button>
         </div>
       </div>
