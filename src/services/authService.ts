@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://back-end-projetokirvano-b30617960bd0.herokuapp.com/api';
+const API_BASE_URL = 'https://api-back-bdc17262bab6.herokuapp.com/api';
 
 interface ApiErrorResponse {
   data: {

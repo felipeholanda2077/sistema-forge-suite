@@ -2,7 +2,7 @@ import { Pokemon } from './pokemonApi';
 import { authService } from './authService';
 
 // Use environment variable if available, otherwise fall back to localhost
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://back-end-projetokirvano-b30617960bd0.herokuapp.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api-back-bdc17262bab6.herokuapp.com/api';
 
 interface ApiErrorResponse {
   data: {
