@@ -6,13 +6,13 @@
 [![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=flat&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
 
+Uma plataforma completa para explorar, gerenciar e interagir com Pokémon, desenvolvida com tecnologias modernas e arquitetura escalável, com potencial para ser adaptada como solução white label. 
+
 ## Links importantes 
 
 - Swagger(https://api-back-bdc17262bab6.herokuapp.com/api-docs/)
 - Link do Front em produção(https://sistema-forge-suite.vercel.app/)
 - Link de verificação de status do Back(https://api-back-bdc17262bab6.herokuapp.com/api/health)
-
-Uma plataforma completa para explorar, gerenciar e interagir com Pokémon, construída com tecnologias modernas e arquitetura escalável.
 
 ## 📋 Índice
 
