@@ -39,8 +39,8 @@ const Index = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-5 gap-4">
-                <div className="p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg space-y-2 border border-primary/20 hover:scale-105 transition-bounce">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                <div className="h-full p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg space-y-2 border border-primary/20 hover:scale-105 transition-bounce flex flex-col">
                   <div className="flex items-center gap-2">
                     <Shield className="w-5 h-5 text-primary" />
                     <span className="font-semibold">🔒 Autenticação Segura</span>
@@ -54,7 +54,7 @@ const Index = () => {
                   </Badge>
                 </div>
 
-                <div className="p-4 bg-muted rounded-lg space-y-2">
+                <div className="h-full p-4 bg-muted rounded-lg space-y-2 flex flex-col">
                   <div className="flex items-center gap-2">
                     <Database className="w-5 h-5 text-primary" />
                     <span className="font-semibold">🌐 Integração PokeAPI</span>
@@ -68,7 +68,7 @@ const Index = () => {
                   </Badge>
                 </div>
 
-                <div className="p-4 bg-muted rounded-lg space-y-2">
+                <div className="h-full p-4 bg-muted rounded-lg space-y-2 flex flex-col">
                   <div className="flex items-center gap-2">
                     <Zap className="w-5 h-5 text-primary" />
                     <span className="font-semibold">⚡ Cache Otimizado</span>
@@ -82,7 +82,7 @@ const Index = () => {
                   </Badge>
                 </div>
 
-                <div className="p-4 bg-muted rounded-lg space-y-2">
+                <div className="h-full p-4 bg-muted rounded-lg space-y-2 flex flex-col">
                   <div className="flex items-center gap-2">
                     <GitBranch className="w-5 h-5 text-primary" />
                     <span className="font-semibold">🔄 Favoritos</span>
@@ -96,7 +96,7 @@ const Index = () => {
                   </Badge>
                 </div>
 
-                <div className="p-4 bg-muted rounded-lg space-y-2">
+                <div className="h-full p-4 bg-muted rounded-lg space-y-2 flex flex-col">
                   <div className="flex items-center gap-2">
                     <GitBranch className="w-5 h-5 text-primary" />
                     <span className="font-semibold">🔗 Back-end</span>
