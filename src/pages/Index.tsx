@@ -39,7 +39,7 @@ const Index = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-5 gap-4">
                 <div className="p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg space-y-2 border border-primary/20 hover:scale-105 transition-bounce">
                   <div className="flex items-center gap-2">
                     <Shield className="w-5 h-5 text-primary" />
