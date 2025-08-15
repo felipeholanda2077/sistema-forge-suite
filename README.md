@@ -1,159 +1,286 @@
-# Sistema Arcane Forge - Explorador Pokémon
+# 🏰 Arcane Forge - Sistema de Gerenciamento Pokémon
 
-Uma aplicação web moderna para explorar e gerenciar seus Pokémon favoritos, construída com React, TypeScript e Node.js.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=flat&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+
+## Links importantes 
+
+- Swagger(https://api-back-bdc17262bab6.herokuapp.com/api-docs/)
+- Link do Front em produção(https://sistema-forge-suite.vercel.app/)
+- Link de verificação de status do Back(https://api-back-bdc17262bab6.herokuapp.com/api/health)
+
+Uma plataforma completa para explorar, gerenciar e interagir com Pokémon, construída com tecnologias modernas e arquitetura escalável.
+
+## 📋 Índice
+
+- [✨ Funcionalidades Principais](#-funcionalidades-principais)
+- [🚀 Começando](#-começando)
+  - [Pré-requisitos](#pré-requisitos)
+  - [Configuração do Ambiente](#-configuração-do-ambiente)
+- [⚙️ Configuração](#️-configuração)
+  - [Backend](#backend)
+  - [Frontend](#frontend)
+  - [Variáveis de Ambiente](#variáveis-de-ambiente)
+- [🏗️ Arquitetura](#️-arquitetura)
+  - [Backend](#backend-1)
+  - [Frontend](#frontend-1)
+- [🛠️ Tecnologias Utilizadas](#️-tecnologias-utilizadas)
+- [📦 Estrutura do Projeto](#-estrutura-do-projeto)
+- [🔌 Integrações](#-integrações)
+- [🧪 Testes](#-testes)
+- [🐳 Docker](#-docker)
+- [🔄 CI/CD](#-cicd)
+- [📚 Documentação](#-documentação)
+- [🤝 Contribuição](#-contribuição)
+- [📄 Licença](#-licença)
+
+## ✨ Funcionalidades Principais
+
+- **Autenticação Segura**
+  - Login/Registro de usuários
+  - Recuperação de senha
+  - Tokens JWT para autenticação
+  - Rotas protegidas
+
+- **Exploração Pokémon**
+  - Listagem completa de Pokémon
+  - Busca avançada
+  - Filtros por tipo, região e atributos
+  - Detalhes completos de cada Pokémon
+
+- **Sistema de Favoritos**
+  - Adicionar/remover favoritos
+  - Lista pessoal de Pokémon favoritos
+  - Sincronização em tempo real
+
+- **Perfil do Usuário**
+  - Gerenciamento de dados pessoais
+  - Histórico de atividades
+  - Preferências de exibição
 
 ## 🚀 Começando
 
 ### Pré-requisitos
 
-- Node.js (v16+)
-- npm (v8+) ou yarn
-- MongoDB (v5+)
-- Redis (v6+) - Opcional, utiliza cache em memória como fallback
+- Node.js (v18+)
+- npm (v9+) ou yarn (v1.22+)
+- MongoDB (v6+)
+- Redis (v7+) - Opcional
+- Git
 
-## 🛠️ Configuração
+### Configuração do Ambiente
+
+1. **Clonar o repositório**
+   ```bash
+   git clone https://github.com/seu-usuario/arcane-forge.git
+   cd arcane-forge
+   ```
+
+2. **Instalar dependências globais (opcional)**
+   ```bash
+   npm install -g typescript ts-node nodemon
+   ```
+
+---
+
+## ⚙️ Configuração
 
 ### Backend
 
-1. Navegue até o diretório do backend:
-   ```bash
-   cd backend
-   ```
+```bash
+cd backend
+npm install
+# ou
+yarn
+```
 
-2. Instale as dependências:
-   ```bash
-   npm install
-   # ou
-   yarn
-   ```
-
-3. Crie um arquivo `.env` no diretório do backend:
-   ```env
-   MONGODB_URI=mongodb://localhost:27017/kirvano
-   JWT_SECRET=sua_chave_secreta_aqui
-   PORT=3001
-   # Configuração opcional do Redis
-   REDIS_HOST=localhost
-   REDIS_PORT=6379
-   REDIS_PASSWORD=
-   REDIS_DB=0
-   ```
-
-4. Inicie o servidor backend:
-   ```bash
-   npm run dev
-   # ou
-   yarn dev
-   ```
+- Configure o arquivo `.env` (veja [Variáveis de Ambiente](#variáveis-de-ambiente))
+- Inicie o servidor:
+```bash
+npm run dev
+# ou
+yarn dev
+```
 
 ### Frontend
 
-1. Navegue até o diretório do frontend:
-   ```bash
-   cd frontend
-   ```
+```bash
+cd frontend
+npm install
+# ou
+yarn
+```
 
-2. Instale as dependências:
-   ```bash
-   npm install
-   # ou
-   yarn
-   ```
+- Configure o arquivo `.env` (veja [Variáveis de Ambiente](#variáveis-de-ambiente))
+- Inicie o servidor:
+```bash
+npm run dev
+# ou
+yarn dev
+```
+- Acesse [http://localhost:8080](http://localhost:8080)
 
-3. Crie um arquivo `.env` no diretório do frontend:
-   ```env
-   REACT_APP_API_URL=http://localhost:3002/api
-   ```
+---
 
-4. Inicie o servidor de desenvolvimento:
-   ```bash
-   npm start
-   # ou
-   yarn start
-   ```
+## Variáveis de Ambiente
 
-5. Acesse [http://localhost:8080](http://localhost:8080) no seu navegador.
+### Backend (.env)
+```env
+PORT=3001
+NODE_ENV=development
+
+MONGODB_URI=mongodb://localhost:27017/arcane_forge
+MONGODB_TEST_URI=mongodb://localhost:27017/arcane_forge_test
+
+JWT_SECRET=sua_chave_secreta_aqui
+JWT_EXPIRES_IN=7d
+REFRESH_TOKEN_SECRET=outra_chave_secreta_aqui
+REFRESH_TOKEN_EXPIRES_IN=30d
+
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
+
+CORS_ORIGIN=http://localhost:8080
+
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX=100
+```
+
+### Frontend (.env)
+```env
+VITE_API_URL=http://localhost:3002/api
+VITE_ENV=development
+
+VITE_AUTH_TOKEN_KEY=authToken
+VITE_REFRESH_TOKEN_KEY=refreshToken
+
+VITE_RECAPTCHA_SITE_KEY=sua_chave_recaptcha
+VITE_GA_TRACKING_ID=UA-XXXXXXXXX-X
+```
+
+---
 
 ## 🏗️ Arquitetura
 
 ### Backend
-
-1. **Padrão API Gateway**
-   - Rotas centralizadas através do prefixo `/api`
-   - Rotas organizadas em endpoints públicos e protegidos
-   - Tratamento de autenticação e autorização
-
-2. **BFF (Backend for Frontend)**
-   - Camada de serviço dedicada para dados de Pokémon
-   - Transforma e filtra dados para consumo do frontend
-   - Implementa rate limiting e validação de requisições
-
-3. **Estratégia de Cache**
-   - Cache em múltiplas camadas (Redis + fallback em memória)
-   - TTL configurável para diferentes endpoints
-   - Invalidação automática de cache
-
-4. **Banco de Dados**
-   - MongoDB para esquema flexível
-   - Índices otimizados para campos frequentemente consultados
-   - Validação de dados no nível do esquema
+- **API Gateway**: Rotas RESTful organizadas por domínio
+- **Serviços**: Lógica de negócios isolada
+- **Banco**: MongoDB + Mongoose
+- **Cache**: Redis ou fallback em memória
+- **Segurança**: JWT, Rate limiting, Sanitização
 
 ### Frontend
+- **Estrutura**: Components, Pages, Services, Hooks
+- **Estado**: Context API + React Query
+- **Estilo**: Tailwind CSS + shadcn/ui
+- **Performance**: Code splitting, Lazy loading
 
-1. **Arquitetura Baseada em Componentes**
-   - Componentes de UI reutilizáveis
-   - Princípios do Atomic Design
-   - Documentação de componentes com Storybook
-
-2. **Gerenciamento de Estado**
-   - Context API do React para estado global
-   - Hooks personalizados para busca e cache de dados
-   - Atualizações otimistas da interface
+---
 
 ## 🛠️ Tecnologias Utilizadas
 
-### Backend
-- **Node.js** - Ambiente de execução JavaScript
-- **Express** - Framework web
-- **MongoDB** - Banco de dados NoSQL
-- **Redis** - Armazenamento em memória (cache)
-- **JWT** - Autenticação
-- **Mongoose** - Modelagem de objetos MongoDB
+**Backend**:
+Node.js, Express, TypeScript, MongoDB, Mongoose, Redis, JWT, Jest, Swagger
 
-### Frontend
-- **React** - Biblioteca de UI
-- **TypeScript** - Verificação de tipos
-- **Axios** - Cliente HTTP
-- **React Query** - Busca e cache de dados
-- **Tailwind CSS** - Estilização
-- **Storybook** - Documentação de componentes
+**Frontend**:
+React, TypeScript, Vite, React Router, React Query, Tailwind CSS, shadcn/ui, Axios, Zod
 
-### DevOps
-- **Docker** - Containerização
-- **GitHub Actions** - CI/CD
-- **ESLint & Prettier** - Qualidade de código
+**DevOps**:
+Docker, GitHub Actions, ESLint, Prettier, Husky
 
-## 📚 Documentação da API
+---
 
-Consulte o arquivo [API_DOCS.md](API_DOCS.md) para a documentação completa da API.
+## 📦 Estrutura do Projeto
+```plaintext
+arcane-forge/
+├── backend/
+│   ├── src/
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   └── app.ts
+│   └── tests/
+├── frontend/
+│   ├── public/
+│   └── src/
+│       ├── components/
+│       ├── pages/
+│       ├── services/
+│       ├── styles/
+│       └── utils/
+├── docs/
+├── .github/
+└── docker/
+```
 
-## 📝 Licença
+---
 
-Este projeto está licenciado sob a Licença MIT - consulte o arquivo [LICENSE](LICENSE) para obter detalhes.
+## 🔌 Integrações
+- **PokeAPI**
 
-## 🙏 Agradecimentos
+---
 
-- Dados de Pokémon fornecidos por [PokeAPI](https://pokeapi.co/)
-- Ícones do [React Icons](https://react-icons.github.io/react-icons/)
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🧪 Testes
+```bash
+# Backend
+cd backend
+npm test
+npm run test:coverage
 
-## Quais tecnologias são usadas neste projeto?
+# Frontend
+cd frontend
+npm test
+npm run test:coverage
+```
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🐳 Docker
 
+**Desenvolvimento**
+```bash
+docker-compose up -d
+docker-compose down
+```
+
+**Produção**
+```bash
+docker-compose -f docker-compose.prod.yml build
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+---
+
+## 🔄 CI/CD
+- **Lint**: ESLint
+- **Testes**: Jest
+- **Build** Heroku
+- **Deploy**: GitHub Actions
+
+---
+
+## 📚 Documentação
+- Documentação da API
+- Guia de Estilo
+- Guia de Contribuição
+
+---
+
+## 🤝 Contribuição
+1. Faça um fork
+2. Crie uma branch (`feature/MinhaFeature`)
+3. Commit (`git commit -m 'MinhaFeature'`)
+4. Push (`git push origin feature/MinhaFeature`)
+5. Abra um Pull Request
+
+---
+
+## 📄 Licença
+Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
