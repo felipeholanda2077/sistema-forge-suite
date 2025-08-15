@@ -359,54 +359,9 @@ export function RegisterPage() {
                 <div className="h-1 w-6 bg-blue-500 rounded-full"></div>
               </div>
 
-
-              {error && (
-                <motion.div
-                  className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 mb-6 rounded-r"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
               
             </motion.div>
 
-            <motion.div
-              className="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 text-center"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <motion.div
-                className="mt-6 text-center text-sm text-gray-700 font-medium"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-              >
-                <p className="mb-2">Já é um treinador?</p>
-                <Link
-                  to="/login"
-                  className="inline-flex items-center font-bold text-blue-600 hover:text-blue-700 hover:underline"
-                >
-                  Faça login na sua conta
-                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </Link>
-              </motion.div>
-            </motion.div>
           </motion.div>
         </motion.div>
       </motion.div>
