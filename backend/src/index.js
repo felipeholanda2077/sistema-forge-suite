@@ -40,6 +40,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:8080',
   'https://arcane-forge-suite.vercel.app',
+  'https://sistema-arcane-forge.vercel.app',
   'https://back-end-projetokirvano-b30617960bd0.herokuapp.com',
   process.env.FRONTEND_URL
 ].filter(Boolean);
