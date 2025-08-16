@@ -9,7 +9,15 @@ import connectDB from './config/db.js';
 console.log('Starting application...');
 console.log('Environment:', process.env.NODE_ENV || 'development');
 console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
-import { registerUser, getUsers, loginUser, forgotPassword, logoutUser } from './controllers/userController.js';
+import { 
+  registerUser, 
+  getUsers, 
+  loginUser, 
+  forgotPassword, 
+  logoutUser, 
+  getUserProfile,
+  updateUserProfile 
+} from './controllers/userController.js';
 import { validateUserRegistration } from './middleware/validators/userValidator.js';
 import { validateLogin } from './middleware/validators/authValidator.js';
 import { authenticateToken } from './middleware/auth.js';
@@ -107,6 +115,9 @@ router.post('/users/login', validateLogin, loginUser);
 router.post('/users/logout', authenticateToken, logoutUser);
 router.post('/users/forgot-password', forgotPassword);
 router.get('/users', getUsers);
+router.get('/users/:userId', authenticateToken, getUserProfile);
+// Update user profile without authentication
+router.put('/users/:userId', updateUserProfile);
 
 // Mount favorites routes directly on the app to bypass authentication middleware
 app.use('/api/favorites', userFavoriteRoutes);

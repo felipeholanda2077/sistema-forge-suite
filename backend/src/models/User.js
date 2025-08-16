@@ -52,20 +52,51 @@ const userSchema = new mongoose.Schema({
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password')) {
+    console.log('Password not modified, skipping hashing');
+    return next();
+  }
   
   try {
+    console.log('Hashing new password...');
     const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+    console.log('Generated salt:', salt);
+    
+    const hashedPassword = await bcrypt.hash(this.password, salt);
+    console.log('Password hashed successfully');
+    
+    this.password = hashedPassword;
     next();
   } catch (error) {
+    console.error('Error hashing password:', error);
     next(error);
   }
 });
 
 // Method to compare passwords
 userSchema.methods.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+  try {
+    console.log('Comparing passwords...');
+    console.log('Candidate password length:', candidatePassword ? candidatePassword.length : 'undefined');
+    console.log('Stored password hash exists:', !!this.password);
+    
+    if (!candidatePassword || !this.password) {
+      console.log('Missing password for comparison');
+      return false;
+    }
+    
+    const isMatch = await bcrypt.compare(candidatePassword, this.password);
+    console.log('Password comparison result:', isMatch);
+    return isMatch;
+  } catch (error) {
+    console.error('Error in comparePassword:', {
+      message: error.message,
+      stack: error.stack,
+      candidatePasswordLength: candidatePassword ? candidatePassword.length : 'undefined',
+      storedPasswordExists: !!this.password
+    });
+    throw error;
+  }
 };
 
 // Method to invalidate a token
