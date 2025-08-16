@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 
-const API_URL = 'http://localhost:3002/api';
+const API_URL = 'https://api-back-bdc17262bab6.herokuapp.com/api';
 
 // Interface for the API response
 export interface ApiResponse<T> {
@@ -106,7 +106,7 @@ export const userService = {
       if (error.response?.status === 404) {
         console.log('Trying with full URL...');
         try {
-          const altResponse = await axios.get(`http://localhost:3002/api/users/${userId}`, {
+          const altResponse = await axios.get(`https://api-back-bdc17262bab6.herokuapp.com/api/users/${userId}`, {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
               'Content-Type': 'application/json'
