@@ -11,8 +11,10 @@ import {
   Code, 
   Database,
   Cpu,
-  Network
+  Network,
+  User
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useMicrofrontend } from '@/contexts/MicrofrontendContext';
 
 const Header: React.FC = () => {
@@ -33,23 +35,32 @@ const Header: React.FC = () => {
           </div>
 
           {/* Indicadores de Arquitetura */}
-          <div className="flex flex-wrap gap-2 justify-center md:justify-end">
-            <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30 transition-smooth">
-              <Layers className="w-3 h-3 mr-1" />
-              Microfrontends
-            </Badge>
-            <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30 transition-smooth">
-              <Database className="w-3 h-3 mr-1" />
-              Cache Inteligente
-            </Badge>
-            <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30 transition-smooth">
-              <Network className="w-3 h-3 mr-1" />
-              API Externa
-            </Badge>
-            <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30 transition-smooth">
-              <Code className="w-3 h-3 mr-1" />
-              TypeScript
-            </Badge>
+          <div className="flex items-center gap-4">
+            <Link 
+              to="/profile" 
+              className="flex items-center gap-2 px-4 py-2 bg-white/20 text-white rounded-md border border-white/30 hover:bg-white/30 transition-smooth"
+            >
+              <User className="w-4 h-4" />
+              <span>Perfil</span>
+            </Link>
+            <div className="flex flex-wrap gap-2 justify-center md:justify-end">
+              <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30 transition-smooth">
+                <Layers className="w-3 h-3 mr-1" />
+                Microfrontends
+              </Badge>
+              <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30 transition-smooth">
+                <Database className="w-3 h-3 mr-1" />
+                Cache Inteligente
+              </Badge>
+              <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30 transition-smooth">
+                <Network className="w-3 h-3 mr-1" />
+                API Externa
+              </Badge>
+              <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30 transition-smooth">
+                <Code className="w-3 h-3 mr-1" />
+                TypeScript
+              </Badge>
+            </div>
           </div>
         </div>
 

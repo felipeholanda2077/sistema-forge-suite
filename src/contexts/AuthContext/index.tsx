@@ -11,6 +11,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return !!token;
   });
   
+  const [user, setUser] = React.useState<UserData | null>(() => {
+    const userData = localStorage.getItem('userData');
+    return userData ? JSON.parse(userData) : null;
+  });
+  
   // Get the MicrofrontendContext dispatch function
   const { dispatch } = useMicrofrontend();
 
@@ -47,48 +52,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('authToken', token);
     
     if (userData) {
-      console.log('User data to be stored:', userData);
-      localStorage.setItem('userData', JSON.stringify(userData));
-      
-      // Atualiza o estado do usuário imediatamente
-      const user = userData;
-      
-      // Garante que favoritePokemons seja um array de números (IDs)
-      let favoritePokemonIds: number[] = [];
-      if (user.favoritePokemons && Array.isArray(user.favoritePokemons)) {
-        favoritePokemonIds = user.favoritePokemons
-          .map(fav => {
-            if (typeof fav === 'number') return fav;
-            if (fav && typeof fav === 'object' && 'id' in fav) return fav.id;
-            return null;
-          })
-          .filter((id): id is number => id !== null);
+      // Normalize user data - handle both id and _id
+      const userId = userData.id || userData._id;
+      if (!userId) {
+        console.error('No user ID found in login data');
+        return;
       }
       
-      console.log('Dispatching SET_USER with payload:', {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        favoritePokemons: favoritePokemonIds
-      });
+      // Ensure favoritePokemons is always an array of numbers
+      const favoritePokemons = Array.isArray(userData.favoritePokemons) 
+        ? userData.favoritePokemons.filter((fav): fav is number => typeof fav === 'number')
+        : [];
       
+      // Create normalized user object with both id and _id for compatibility
+      const normalizedUser: UserData & { id: string; _id: string } = {
+        ...userData,
+        id: userId,
+        _id: userId, // Ensure _id is always set
+        favoritePokemons
+      };
+      
+      console.log('User data to be stored:', normalizedUser);
+      localStorage.setItem('userData', JSON.stringify(normalizedUser));
+      setUser(normalizedUser);
+      
+      // Dispatch to update global state
       dispatch({ 
         type: 'SET_USER', 
         payload: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          favoritePokemons: favoritePokemonIds
-        } 
+          id: userId,
+          _id: userId,
+          email: normalizedUser.email,
+          name: normalizedUser.name,
+          favoritePokemons: normalizedUser.favoritePokemons
+        }
       });
-    } else {
-      console.log('No user data provided to login function');
     }
     
-    console.log('AuthProvider - login - Setting isAuthenticated to true');
-    // Atualiza o estado de autenticação imediatamente
     setIsAuthenticated(true);
-    console.log('isAuthenticated state updated to true');
+    console.log('AuthProvider - login - isAuthenticated set to true');
   };
 
   const clearAllCaches = async () => {
@@ -131,42 +133,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const logout = async () => {
-    console.log('AuthProvider - logout - Starting logout process');
-    
-    try {
-      // Call the authService to invalidate the token on the server
-      const { authService } = await import('@/services/authService');
-      await authService.logout();
-      
-      // Clear all caches
-      await clearAllCaches();
-      
-      // Clear authentication data
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('userData');
-      
-      // Clear user data in global state
-      dispatch({ type: 'LOGOUT' });
-      
-      // Update authentication state
-      setIsAuthenticated(false);
-      
-      console.log('AuthProvider - logout - Logout completed successfully');
-    } catch (error) {
-      console.error('Error during logout:', error);
-      // Even if there's an error, we still want to proceed with logout
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('userData');
-      dispatch({ type: 'LOGOUT' });
-      setIsAuthenticated(false);
-    }
+  const logout = () => {
+    console.log('AuthProvider - logout - Clearing auth data');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');
+    setUser(null);
+    dispatch({ type: 'LOGOUT' });
+    setIsAuthenticated(false);
+    console.log('AuthProvider - logout - isAuthenticated set to false');
   };
 
   const value: AuthContextType = {
     isAuthenticated,
+    user,
     login,
     logout
   };

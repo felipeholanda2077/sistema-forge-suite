@@ -10,6 +10,7 @@ import { Pokemon } from '@/services/pokemonApi';
 
 interface User {
   id: string;
+  _id?: string; // MongoDB _id
   email: string;
   name: string;
   favoritePokemons: number[];

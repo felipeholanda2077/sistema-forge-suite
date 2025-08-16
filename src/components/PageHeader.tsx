@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button/button';
 import { useAuth } from '@/hooks/useAuth';
-import { LogOut, Loader2 } from 'lucide-react';
+import { LogOut, Loader2, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 
 export function PageHeader() {
@@ -43,6 +44,13 @@ export function PageHeader() {
           <span className="font-bold">Sistema Arcane Forge</span>
         </div>
         <div className="flex items-center space-x-2">
+          <Link 
+            to="/profile" 
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 hover:bg-accent hover:text-accent-foreground"
+          >
+            <User className="w-4 h-4 mr-2" />
+            Perfil
+          </Link>
           <Button 
             variant="ghost" 
             size="sm" 
